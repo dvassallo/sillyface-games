@@ -1,0 +1,79 @@
+name: Deploy Apps
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      force_setup:
+        description: 'Force re-run server setup'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  DOMAIN: ${{ secrets.DOMAIN }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Check if server needs setup
+        id: check_setup
+        run: |
+          # Check if SSL cert exists for this domain (indicates setup was done)
+          SETUP_DONE=$(ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            root@${{ secrets.DEPLOY_HOST }} \
+            "test -d /etc/letsencrypt/live/${{ env.DOMAIN }} && echo 'yes' || echo 'no'")
+          
+          echo "setup_done=$SETUP_DONE" >> $GITHUB_OUTPUT
+          
+          if [ "$SETUP_DONE" = "yes" ]; then
+            echo "✓ Server is already set up"
+          else
+            echo "→ Server needs setup"
+          fi
+
+      - name: Run server setup
+        if: steps.check_setup.outputs.setup_done == 'no' || inputs.force_setup == true
+        run: |
+          echo "Setting up server for domain: ${{ env.DOMAIN }}"
+          
+          # Copy setup files to server
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            server-setup/setup.sh \
+            server-setup/nginx-apps.conf \
+            root@${{ secrets.DEPLOY_HOST }}:/tmp/
+          
+          # Run setup script
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            root@${{ secrets.DEPLOY_HOST }} \
+            "chmod +x /tmp/setup.sh && /tmp/setup.sh ${{ env.DOMAIN }} ${{ secrets.CLOUDFLARE_API_TOKEN }} ${{ secrets.LETSENCRYPT_EMAIL }}"
+
+      - name: Deploy apps via rsync
+        run: |
+          rsync -avz --delete \
+            --exclude '.git' \
+            --exclude '.github' \
+            --exclude 'server-setup' \
+            --exclude 'README.md' \
+            --exclude 'LICENSE' \
+            --exclude '.gitignore' \
+            --exclude '*.md' \
+            -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
+            ./ root@${{ secrets.DEPLOY_HOST }}:/var/www/apps/
+
+      - name: Clean up
+        run: rm -f ~/.ssh/deploy_key
