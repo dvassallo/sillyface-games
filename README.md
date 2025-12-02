@@ -111,13 +111,14 @@ Before starting, you'll need:
 
    | Secret Name | Value |
    |-------------|-------|
-   | `DEPLOY_HOST` | Your server's IP address |
-   | `DEPLOY_KEY` | Contents of `~/.ssh/vibehost_deploy` (the private key) |
    | `DOMAIN` | Your domain name (e.g., `example.com`) |
+   | `DEPLOY_KEY` | Contents of `~/.ssh/vibehost_deploy` (the private key) |
    | `CLOUDFLARE_API_TOKEN` | Your Cloudflare API token from Step 1 |
    | `LETSENCRYPT_EMAIL` | Your email for SSL certificate notifications |
 
    > **Note**: For `DEPLOY_KEY`, paste the entire private key including `-----BEGIN` and `-----END` lines.
+   
+   The server IP is automatically resolved from your domain's DNS record—no need to enter it separately.
 
 ### Step 4: Deploy!
 
