@@ -33,10 +33,10 @@ jobs:
       - name: Check if server needs setup
         id: check_setup
         run: |
-          # Check if SSL cert exists for this domain (indicates setup was done)
+          # Check if root domain cert exists (indicates setup was done)
           SETUP_DONE=$(ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             root@${{ env.DOMAIN }} \
-            "test -d /etc/letsencrypt/live/${{ env.DOMAIN }} && echo 'yes' || echo 'no'")
+            "test -f /usr/local/bin/ensure-cert.sh && test -d /etc/letsencrypt/live/${{ env.DOMAIN }} && echo 'yes' || echo 'no'")
           
           echo "setup_done=$SETUP_DONE" >> $GITHUB_OUTPUT
           
@@ -57,10 +57,10 @@ jobs:
             server-setup/nginx-apps.conf \
             root@${{ env.DOMAIN }}:/tmp/
           
-          # Run setup script
+          # Run setup script (now only needs domain and email, no Cloudflare token)
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
             root@${{ env.DOMAIN }} \
-            "chmod +x /tmp/setup.sh && /tmp/setup.sh ${{ env.DOMAIN }} ${{ secrets.CLOUDFLARE_API_TOKEN }} ${{ secrets.LETSENCRYPT_EMAIL }}"
+            "chmod +x /tmp/setup.sh && /tmp/setup.sh ${{ env.DOMAIN }} ${{ secrets.LETSENCRYPT_EMAIL }}"
 
       - name: Generate app index
         run: |
@@ -178,6 +178,46 @@ jobs:
             --exclude '*.md' \
             -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no" \
             ./ root@${{ env.DOMAIN }}:/var/www/apps/
+
+      - name: Issue SSL certificates for apps
+        run: |
+          DOMAIN="${{ env.DOMAIN }}"
+          EMAIL="${{ secrets.LETSENCRYPT_EMAIL }}"
+          
+          # Find all app directories
+          APPS=$(find . -maxdepth 1 -type d \
+            ! -name '.' \
+            ! -name '.git' \
+            ! -name '.github' \
+            ! -name 'server-setup' \
+            ! -name '_root' \
+            -printf '%f\n' | sort)
+          
+          CERTS_ISSUED=0
+          for app in $APPS; do
+            echo "Ensuring certificate for ${app}.${DOMAIN}..."
+            
+            # Run ensure-cert.sh on the server
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+              root@${{ env.DOMAIN }} \
+              "/usr/local/bin/ensure-cert.sh $app $DOMAIN $EMAIL" && CERTS_ISSUED=$((CERTS_ISSUED + 1)) || true
+          done
+          
+          echo "Processed certificates for $CERTS_ISSUED apps"
+
+      - name: Update nginx config and reload
+        run: |
+          # Copy latest nginx config
+          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            server-setup/nginx-apps.conf \
+            root@${{ env.DOMAIN }}:/tmp/nginx-apps.conf
+          
+          # Update config and reload nginx
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            root@${{ env.DOMAIN }} \
+            "sed 's/DOMAIN_PLACEHOLDER/${{ env.DOMAIN }}/g' /tmp/nginx-apps.conf > /etc/nginx/sites-available/apps && \
+             ln -sf /etc/nginx/sites-available/apps /etc/nginx/sites-enabled/apps && \
+             nginx -t && systemctl reload nginx"
 
       - name: Clean up
         run: rm -f ~/.ssh/deploy_key

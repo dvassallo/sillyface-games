@@ -4,8 +4,8 @@
 # Idempotent setup for deploying multiple static web apps with automatic subdomain routing
 # Safe to run multiple times - skips steps that are already complete
 #
-# Usage: ./setup.sh <domain> <cloudflare_api_token> <email>
-# Example: ./setup.sh example.com cf_token_xxx admin@example.com
+# Usage: ./setup.sh <domain> <email>
+# Example: ./setup.sh example.com admin@example.com
 
 set -e
 
@@ -23,27 +23,25 @@ log_skip() { echo -e "${YELLOW}[SKIP]${NC} $1"; }
 
 # Check if running as root
 if [ "$EUID" -ne 0 ]; then
-    log_error "Please run this script as root (sudo ./setup.sh ...)"
+    log_error "Please run this script as root"
     exit 1
 fi
 
 # Check arguments
-if [ $# -lt 3 ]; then
-    echo "Usage: $0 <domain> <cloudflare_api_token> <email>"
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <domain> <email>"
     echo ""
     echo "Arguments:"
-    echo "  domain              Your domain name (e.g., example.com)"
-    echo "  cloudflare_api_token  Cloudflare API token with DNS edit permissions"
-    echo "  email               Email for Let's Encrypt notifications"
+    echo "  domain    Your domain name (e.g., example.com)"
+    echo "  email     Email for Let's Encrypt notifications"
     echo ""
     echo "Example:"
-    echo "  sudo $0 example.com cf_xxxxxxxxxxxxx admin@example.com"
+    echo "  $0 example.com admin@example.com"
     exit 1
 fi
 
 DOMAIN=$1
-CF_API_TOKEN=$2
-EMAIL=$3
+EMAIL=$2
 
 log_info "Starting VibeHost server setup for domain: $DOMAIN"
 
@@ -59,9 +57,9 @@ else
 fi
 
 if ! command -v certbot &> /dev/null; then
-    log_info "Installing Certbot with Cloudflare DNS plugin..."
+    log_info "Installing Certbot..."
     apt-get update -qq
-    apt-get install -y -qq certbot python3-certbot-dns-cloudflare
+    apt-get install -y -qq certbot
 else
     log_skip "Certbot already installed"
 fi
@@ -75,7 +73,7 @@ if [ ! -d "/var/www/apps" ]; then
     mkdir -p /var/www/apps/_root
 else
     log_skip "Directory structure already exists"
-    mkdir -p /var/www/apps/_root  # Ensure _root exists
+    mkdir -p /var/www/apps/_root
 fi
 
 # Create default landing page only if it doesn't exist
@@ -129,49 +127,121 @@ else
     log_skip "Landing page already exists"
 fi
 
+# Create ACME challenge directory for HTTP-01 validation
+mkdir -p /var/www/acme-challenge
+
 # Set permissions
 chown -R www-data:www-data /var/www/apps
 chmod -R 755 /var/www/apps
+chown -R www-data:www-data /var/www/acme-challenge
+chmod -R 755 /var/www/acme-challenge
 
 # ============================================
-# Step 3: Configure Cloudflare credentials (always update)
+# Step 3: Create ensure-cert.sh helper script
 # ============================================
-log_info "Updating Cloudflare credentials..."
-mkdir -p /etc/letsencrypt
-cat > /etc/letsencrypt/cloudflare.ini << EOF
-dns_cloudflare_api_token = $CF_API_TOKEN
+log_info "Creating certificate helper script..."
+cat > /usr/local/bin/ensure-cert.sh << 'CERTSCRIPT'
+#!/bin/bash
+#
+# Ensure SSL certificate exists for a subdomain
+# Usage: ensure-cert.sh <subdomain> <domain> <email>
+# Example: ensure-cert.sh myapp example.com admin@example.com
+#
+# Returns 0 if cert exists or was successfully created
+# Returns 1 on error
+
+set -e
+
+SUBDOMAIN=$1
+DOMAIN=$2
+EMAIL=$3
+
+if [ -z "$SUBDOMAIN" ] || [ -z "$DOMAIN" ] || [ -z "$EMAIL" ]; then
+    echo "Usage: ensure-cert.sh <subdomain> <domain> <email>"
+    exit 1
+fi
+
+FQDN="${SUBDOMAIN}.${DOMAIN}"
+CERT_PATH="/etc/letsencrypt/live/${FQDN}"
+
+# Check if cert already exists
+if [ -d "$CERT_PATH" ]; then
+    echo "Certificate already exists for ${FQDN}"
+    exit 0
+fi
+
+echo "Obtaining certificate for ${FQDN}..."
+
+# Use webroot authentication with the ACME challenge directory
+certbot certonly \
+    --webroot \
+    --webroot-path /var/www/acme-challenge \
+    -d "$FQDN" \
+    --email "$EMAIL" \
+    --agree-tos \
+    --non-interactive \
+    --quiet
+
+if [ $? -eq 0 ]; then
+    echo "Certificate obtained successfully for ${FQDN}"
+    exit 0
+else
+    echo "Failed to obtain certificate for ${FQDN}"
+    exit 1
+fi
+CERTSCRIPT
+
+chmod +x /usr/local/bin/ensure-cert.sh
+
+# ============================================
+# Step 4: Get certificate for root domain
+# ============================================
+CERT_PATH="/etc/letsencrypt/live/${DOMAIN}"
+if [ ! -d "$CERT_PATH" ]; then
+    log_info "Obtaining certificate for root domain: $DOMAIN"
+    
+    # First, set up a temporary nginx config for ACME challenges
+    cat > /etc/nginx/sites-available/acme-temp << EOF
+server {
+    listen 80;
+    listen [::]:80;
+    server_name $DOMAIN *.$DOMAIN;
+    
+    location /.well-known/acme-challenge/ {
+        root /var/www/acme-challenge;
+    }
+    
+    location / {
+        return 444;
+    }
+}
 EOF
-chmod 600 /etc/letsencrypt/cloudflare.ini
-
-# ============================================
-# Step 4: Obtain wildcard SSL certificate (idempotent)
-# ============================================
-if [ ! -d "/etc/letsencrypt/live/$DOMAIN" ]; then
-    log_info "Obtaining wildcard SSL certificate from Let's Encrypt..."
-    log_info "This may take a minute while DNS propagates..."
-
+    
+    ln -sf /etc/nginx/sites-available/acme-temp /etc/nginx/sites-enabled/acme-temp
+    rm -f /etc/nginx/sites-enabled/default
+    rm -f /etc/nginx/sites-enabled/apps
+    nginx -t && systemctl reload nginx
+    
     certbot certonly \
-        --dns-cloudflare \
-        --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
-        --dns-cloudflare-propagation-seconds 30 \
+        --webroot \
+        --webroot-path /var/www/acme-challenge \
         -d "$DOMAIN" \
-        -d "*.$DOMAIN" \
         --email "$EMAIL" \
         --agree-tos \
         --non-interactive
-
+    
     if [ $? -ne 0 ]; then
-        log_error "Failed to obtain SSL certificate. Please check your Cloudflare API token and DNS settings."
+        log_error "Failed to obtain certificate for root domain"
         exit 1
     fi
-
-    log_info "SSL certificate obtained successfully!"
+    
+    log_info "Certificate obtained for root domain"
 else
-    log_skip "SSL certificate already exists for $DOMAIN"
+    log_skip "Root domain certificate already exists"
 fi
 
 # ============================================
-# Step 5: Configure Nginx (always update config)
+# Step 5: Configure Nginx
 # ============================================
 log_info "Configuring Nginx..."
 
@@ -180,78 +250,18 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Check if nginx config template exists
 if [ -f "$SCRIPT_DIR/nginx-apps.conf" ]; then
-    # Use the template from the repo
     sed "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" "$SCRIPT_DIR/nginx-apps.conf" > /etc/nginx/sites-available/apps
 else
-    # Generate inline if template not found
-    cat > /etc/nginx/sites-available/apps << EOF
-# Redirect HTTP to HTTPS
-server {
-    listen 80;
-    listen [::]:80;
-    server_name *.$DOMAIN $DOMAIN;
-    return 301 https://\$host\$request_uri;
-}
-
-# Main HTTPS server with dynamic subdomain routing
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    
-    server_name ~^(?<subdomain>.+)\.$DOMAIN\$;
-    
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
-    
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers off;
-    ssl_session_cache shared:SSL:10m;
-    
-    root /var/www/apps/\$subdomain;
-    index index.html index.htm;
-    
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    
-    gzip on;
-    gzip_types text/plain text/css application/json application/javascript text/xml application/xml;
-    
-    location / {
-        try_files \$uri \$uri/ /index.html =404;
-    }
-    
-    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)\$ {
-        expires 30d;
-        add_header Cache-Control "public, immutable";
-    }
-}
-
-# Root domain server
-server {
-    listen 443 ssl http2;
-    listen [::]:443 ssl http2;
-    server_name $DOMAIN;
-    
-    ssl_certificate /etc/letsencrypt/live/$DOMAIN/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/$DOMAIN/privkey.pem;
-    
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers off;
-    
-    root /var/www/apps/_root;
-    index index.html;
-    
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
+    log_error "nginx-apps.conf template not found!"
+    exit 1
 fi
 
 # Enable the site
 ln -sf /etc/nginx/sites-available/apps /etc/nginx/sites-enabled/apps
 
-# Remove default site if it exists
+# Remove temporary ACME config if it exists
+rm -f /etc/nginx/sites-enabled/acme-temp
+rm -f /etc/nginx/sites-available/acme-temp
 rm -f /etc/nginx/sites-enabled/default
 
 # Test Nginx configuration
@@ -279,7 +289,7 @@ else
     log_skip "Certificate auto-renewal already configured"
 fi
 
-# Add a post-renewal hook to reload Nginx (idempotent)
+# Add a post-renewal hook to reload Nginx
 mkdir -p /etc/letsencrypt/renewal-hooks/deploy
 cat > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh << 'EOF'
 #!/bin/bash

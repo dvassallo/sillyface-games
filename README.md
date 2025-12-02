@@ -13,10 +13,11 @@ Deploy dozens of static websites from a single GitHub repository. Each folder be
 ## Features
 
 - **Zero-config subdomains**: Add a folder, push, and it's live at `foldername.yourdomain.com`
-- **Automatic SSL**: Wildcard Let's Encrypt certificate covers all subdomains
+- **Automatic SSL**: Let's Encrypt certificates issued automatically for each subdomain
 - **Automatic setup**: Server is configured on first deploy—no manual SSH required
 - **Simple deployment**: Git push triggers automatic deployment
 - **Fast & secure**: Nginx serves static files with gzip, caching, and security headers
+- **No vendor lock-in**: Works with any DNS provider—just needs A records
 
 ## How It Works
 
@@ -34,7 +35,7 @@ Deploy dozens of static websites from a single GitHub repository. Each folder be
                                            │  Nginx                  │
                                            │  *.yourdomain.com       │
                                            │  Dynamic routing        │
-                                           │  Wildcard SSL           │
+                                           │  Per-subdomain SSL      │
                                            └─────────────────────────┘
 ```
 
@@ -52,38 +53,24 @@ This means **any new folder automatically works** without touching server config
 Before starting, you'll need:
 
 - [ ] **A domain name** you control
-- [ ] **A Cloudflare account** (free tier works) with your domain added
 - [ ] **A Linux server** (Ubuntu 20.04+ or Debian 11+ recommended)
-  - Fresh VPS from DigitalOcean, Linode, Vultr, etc. ($5-6/month is fine)
+  - Fresh VPS from DigitalOcean, Linode, Vultr, Hetzner, etc. ($5-6/month is fine)
   - Root SSH access with key authentication
   - Ports 80 and 443 open in your firewall
 - [ ] **A GitHub repository** (fork this one or use as template)
 
 ## Setup Guide
 
-### Step 1: Configure Cloudflare DNS
+### Step 1: Configure DNS
 
-1. **Add your domain to Cloudflare** (if not already)
-   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-   - Click "Add a Site" and follow the instructions
-   - Update your domain's nameservers at your registrar
+Add these DNS records at your domain registrar or DNS provider:
 
-2. **Create DNS records** pointing to your server:
-   
-   | Type | Name | Content | Proxy |
-   |------|------|---------|-------|
-   | A | `@` | `your.server.ip` | DNS only (gray cloud) |
-   | A | `*` | `your.server.ip` | DNS only (gray cloud) |
+| Type | Name | Value |
+|------|------|-------|
+| A | `@` | `your.server.ip` |
+| A | `*` | `your.server.ip` |
 
-   > **Important**: Set proxy status to "DNS only" (gray cloud) for SSL to work correctly with Let's Encrypt.
-
-3. **Create a Cloudflare API Token**:
-   - Go to [API Tokens](https://dash.cloudflare.com/profile/api-tokens)
-   - Click "Create Token"
-   - Use the "Edit zone DNS" template
-   - Under "Zone Resources", select your specific domain
-   - Click "Continue to summary" → "Create Token"
-   - **Copy and save the token** (you won't see it again!)
+The wildcard (`*`) record ensures all subdomains point to your server.
 
 ### Step 2: Prepare Your Server
 
@@ -113,7 +100,6 @@ Before starting, you'll need:
    |-------------|-------|
    | `DOMAIN` | Your domain name (e.g., `example.com`) |
    | `DEPLOY_KEY` | Contents of `~/.ssh/vibehost_deploy` (the private key) |
-   | `CLOUDFLARE_API_TOKEN` | Your Cloudflare API token from Step 1 |
    | `LETSENCRYPT_EMAIL` | Your email for SSL certificate notifications |
 
    > **Note**: For `DEPLOY_KEY`, paste the entire private key including `-----BEGIN` and `-----END` lines.
@@ -146,18 +132,18 @@ Before starting, you'll need:
    git push origin main
    ```
 
-4. **Wait for the action to complete** (first deploy takes ~2-3 minutes for server setup, subsequent deploys are ~10 seconds)
+4. **Wait for the action to complete** (first deploy takes ~2-3 minutes for server setup)
 
 5. **Visit your app**: `https://myapp.yourdomain.com`
 
 On the first push, the workflow automatically:
 - Detects the server isn't set up yet
 - Installs Nginx and Certbot
-- Obtains a wildcard SSL certificate
 - Configures everything
+- Issues SSL certificates for each app
 - Deploys your apps
 
-Subsequent pushes skip setup and just deploy.
+Subsequent pushes deploy quickly (~30 seconds, plus ~10 seconds per new app for SSL).
 
 ## Usage
 
@@ -235,9 +221,9 @@ Or trigger manually:
 - Ensure your server allows root SSH login with key authentication
 
 **SSL certificate errors**:
-- Verify Cloudflare DNS records are set to "DNS only" (gray cloud)
-- Check that both `@` and `*` A records point to your server IP
-- Ensure your Cloudflare API token has DNS edit permissions for the domain
+- Verify DNS A records are pointing to your server (both `@` and `*`)
+- DNS propagation can take up to 24-48 hours (usually much faster)
+- Check that ports 80 and 443 are open
 
 ### Deployment Issues
 
@@ -323,5 +309,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Acknowledgments
 
 - [Let's Encrypt](https://letsencrypt.org/) for free SSL certificates
-- [Cloudflare](https://cloudflare.com/) for DNS management
 - [Nginx](https://nginx.org/) for being an excellent web server
