@@ -184,6 +184,10 @@ certbot certonly \
 
 if [ $? -eq 0 ]; then
     echo "Certificate obtained successfully for ${FQDN}"
+    # Fix permissions so nginx workers can read certs
+    chmod 755 /etc/letsencrypt/live/
+    chmod 755 /etc/letsencrypt/archive/
+    chmod 644 /etc/letsencrypt/archive/${FQDN}/*.pem 2>/dev/null || true
     exit 0
 else
     echo "Failed to obtain certificate for ${FQDN}"
@@ -240,6 +244,12 @@ else
     log_skip "Root domain certificate already exists"
 fi
 
+# Fix permissions so nginx workers can read certs (needed for dynamic SSL cert loading)
+log_info "Setting certificate permissions..."
+chmod 755 /etc/letsencrypt/live/
+chmod 755 /etc/letsencrypt/archive/
+find /etc/letsencrypt/archive/ -name "*.pem" -exec chmod 644 {} \; 2>/dev/null || true
+
 # ============================================
 # Step 5: Configure Nginx
 # ============================================
@@ -289,13 +299,21 @@ else
     log_skip "Certificate auto-renewal already configured"
 fi
 
-# Add a post-renewal hook to reload Nginx
+# Add a post-renewal hook to fix permissions and reload Nginx
 mkdir -p /etc/letsencrypt/renewal-hooks/deploy
-cat > /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh << 'EOF'
+cat > /etc/letsencrypt/renewal-hooks/deploy/fix-permissions-and-reload.sh << 'EOF'
 #!/bin/bash
+# Fix permissions so nginx workers can read certs (needed for dynamic SSL)
+chmod 755 /etc/letsencrypt/live/
+chmod 755 /etc/letsencrypt/archive/
+find /etc/letsencrypt/archive/ -name "*.pem" -exec chmod 644 {} \;
+# Reload nginx to pick up renewed certs
 systemctl reload nginx
 EOF
-chmod +x /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
+chmod +x /etc/letsencrypt/renewal-hooks/deploy/fix-permissions-and-reload.sh
+
+# Remove old hook if it exists
+rm -f /etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh
 
 # ============================================
 # Done!
