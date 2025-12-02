@@ -62,6 +62,110 @@ jobs:
             root@${{ secrets.DEPLOY_HOST }} \
             "chmod +x /tmp/setup.sh && /tmp/setup.sh ${{ env.DOMAIN }} ${{ secrets.CLOUDFLARE_API_TOKEN }} ${{ secrets.LETSENCRYPT_EMAIL }}"
 
+      - name: Generate app index
+        run: |
+          # Skip if user has a custom _root/index.html
+          if [ -f "_root/index.html" ]; then
+            echo "Custom _root/index.html found, skipping generation"
+            exit 0
+          fi
+          
+          # Find all app directories (exclude system folders)
+          APPS=$(find . -maxdepth 1 -type d \
+            ! -name '.' \
+            ! -name '.git' \
+            ! -name '.github' \
+            ! -name 'server-setup' \
+            ! -name '_root' \
+            -printf '%f\n' | sort)
+          
+          # Generate _root/index.html
+          mkdir -p _root
+          cat > _root/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Apps</title>
+              <style>
+                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                  body {
+                      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+                      min-height: 100vh;
+                      background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%);
+                      color: #e8e8e8;
+                      padding: 3rem 1.5rem;
+                  }
+                  .container {
+                      max-width: 600px;
+                      margin: 0 auto;
+                  }
+                  h1 {
+                      font-size: 2.5rem;
+                      font-weight: 600;
+                      margin-bottom: 2rem;
+                      background: linear-gradient(135deg, #00d9ff, #00ff88);
+                      -webkit-background-clip: text;
+                      -webkit-text-fill-color: transparent;
+                      background-clip: text;
+                  }
+                  .apps {
+                      display: flex;
+                      flex-direction: column;
+                      gap: 0.75rem;
+                  }
+                  a {
+                      display: block;
+                      padding: 1rem 1.25rem;
+                      background: rgba(255, 255, 255, 0.03);
+                      border: 1px solid rgba(255, 255, 255, 0.08);
+                      border-radius: 12px;
+                      color: #fff;
+                      text-decoration: none;
+                      font-size: 1.1rem;
+                      transition: all 0.2s ease;
+                  }
+                  a:hover {
+                      background: rgba(255, 255, 255, 0.08);
+                      border-color: rgba(0, 217, 255, 0.3);
+                      transform: translateX(4px);
+                  }
+                  .empty {
+                      color: rgba(255, 255, 255, 0.5);
+                      font-style: italic;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="container">
+                  <h1>Apps</h1>
+                  <div class="apps">
+          HTMLEOF
+          
+          # Add links for each app
+          DOMAIN="${{ env.DOMAIN }}"
+          APP_COUNT=0
+          for app in $APPS; do
+              echo "            <a href=\"https://${app}.${DOMAIN}\">${app}</a>" >> _root/index.html
+              APP_COUNT=$((APP_COUNT + 1))
+          done
+          
+          # Handle empty state
+          if [ $APP_COUNT -eq 0 ]; then
+              echo '            <p class="empty">No apps deployed yet.</p>' >> _root/index.html
+          fi
+          
+          # Close HTML
+          cat >> _root/index.html << 'HTMLEOF'
+                  </div>
+              </div>
+          </body>
+          </html>
+          HTMLEOF
+          
+          echo "Generated index with $APP_COUNT apps"
+
       - name: Deploy apps via rsync
         run: |
           rsync -avz --delete \

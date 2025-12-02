@@ -208,9 +208,9 @@ The workflow deploys all folders **except**:
 
 ### Root Domain
 
-The root domain (`https://yourdomain.com`) serves content from a special `_root` folder:
-- Create a `_root/` folder in your repo for a custom landing page
-- Or leave it to show the default VibeHost page
+The root domain (`https://yourdomain.com`) automatically displays an index of all your apps with links to each subdomain. This is generated dynamically on each deploy—no configuration needed.
+
+To use a custom landing page instead, create a `_root/` folder in your repo with your own `index.html`.
 
 ### Force Re-run Setup
 
