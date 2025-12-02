@@ -117,8 +117,6 @@ Before starting, you'll need:
    | `LETSENCRYPT_EMAIL` | Your email for SSL certificate notifications |
 
    > **Note**: For `DEPLOY_KEY`, paste the entire private key including `-----BEGIN` and `-----END` lines.
-   
-   The server IP is automatically resolved from your domain's DNS record—no need to enter it separately.
 
 ### Step 4: Deploy!
 
