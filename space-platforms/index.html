@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Platforms</title>
+    <link rel="stylesheet" href="styles.css?v=7">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        
+        <div id="ui-overlay">
+            <div id="title-screen">
+                <div class="glitch-container">
+                    <h1 class="glitch" data-text="SPACE PLATFORMS">SPACE PLATFORMS</h1>
+                </div>
+                <p class="subtitle glitch-text">A low-gravity adventure</p>
+                <div class="scanlines"></div>
+                <div class="button-group main-buttons">
+                    <button id="start-btn">BEGIN JOURNEY</button>
+                    <button id="battle-btn">BATTLE</button>
+                    <button id="shop-btn">SHOP</button>
+                    <button id="minigames-btn">MINI GAMES</button>
+                    <button id="sports-btn">SPORTS</button>
+                    <button id="career-btn">CAREER <span class="coin-display">🪙 <span id="career-coins">0</span></span></button>
+                    <button id="boxfights-btn">BOX FIGHTS</button>
+                </div>
+                
+                <div class="credit-line">by Nico Vassallo from North Bend</div>
+                
+                <div class="difficulty-select hidden">
+                    <h3>SELECT DIFFICULTY</h3>
+                    <div class="difficulty-buttons">
+                        <button class="diff-btn easy" data-difficulty="easy">
+                            <span class="diff-icon">🌱</span>
+                            <span class="diff-name">EASY</span>
+                            <span class="diff-desc">Bigger platforms, closer together</span>
+                        </button>
+                        <button class="diff-btn normal" data-difficulty="normal">
+                            <span class="diff-icon">⚔️</span>
+                            <span class="diff-name">NORMAL</span>
+                            <span class="diff-desc">Balanced challenge</span>
+                        </button>
+                        <button class="diff-btn hard" data-difficulty="hard">
+                            <span class="diff-icon">💀</span>
+                            <span class="diff-name">HARD</span>
+                            <span class="diff-desc">Tiny platforms, huge gaps</span>
+                        </button>
+                        <button class="diff-btn extreme" data-difficulty="extreme">
+                            <span class="diff-icon">🔥</span>
+                            <span class="diff-name">EXTREME</span>
+                            <span class="diff-desc">Only for the brave...</span>
+                        </button>
+                    </div>
+                    <button id="diff-back-btn">BACK</button>
+                </div>
+                <div class="controls-hint">
+                    <span>WASD / Arrows to move</span>
+                    <span>SPACE to jump</span>
+                    <span>SHIFT to sprint</span>
+                    <span>Q / CLICK to punch (Battle)</span>
+                </div>
+            </div>
+            
+            <div id="hud" class="hidden">
+                <div class="hud-item">
+                    <span class="label" id="altitude-label">ALTITUDE</span>
+                    <span id="altitude-value">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="label">COINS</span>
+                    <span id="coins-value">0</span>
+                </div>
+                <button id="music-btn" title="Music On">🎵</button>
+            </div>
+            
+            <div id="game-over" class="hidden">
+                <div class="game-over-bg"></div>
+                <div class="game-over-content">
+                    <div class="skull-icon">💀</div>
+                    <h2 id="game-over-title">FELL INTO THE VOID</h2>
+                    <div class="game-over-divider"></div>
+                    <div class="stats-container">
+                        <div class="stat">
+                            <span class="stat-icon">🪙</span>
+                            <span class="stat-value" id="final-score">0</span>
+                            <span class="stat-label">COINS</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-icon">📏</span>
+                            <span class="stat-value" id="final-height">0</span>
+                            <span class="stat-label">MAX HEIGHT</span>
+                        </div>
+                    </div>
+                    <p id="game-over-message">Better luck next time...</p>
+                    <button id="restart-btn">
+                        <span class="btn-text">TRY AGAIN</span>
+                        <span class="btn-icon">🔄</span>
+                    </button>
+                    <button id="goback-btn">
+                        <span class="btn-text">GO BACK</span>
+                        <span class="btn-icon">🏠</span>
+                    </button>
+                </div>
+                <div class="particles">
+                    <span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div class="lasers">
+                    <div class="laser laser-1"></div>
+                    <div class="laser laser-2"></div>
+                    <div class="laser laser-3"></div>
+                    <div class="laser laser-4"></div>
+                    <div class="laser laser-5"></div>
+                    <div class="laser laser-6"></div>
+                    <div class="laser laser-7"></div>
+                    <div class="laser laser-8"></div>
+                </div>
+                <div class="rockets">
+                    <div class="rocket rocket-1">🚀</div>
+                    <div class="rocket rocket-2">🚀</div>
+                    <div class="rocket rocket-3">🚀</div>
+                    <div class="rocket rocket-4">🚀</div>
+                    <div class="rocket rocket-5">🚀</div>
+                </div>
+            </div>
+            
+            <div id="victory-screen" class="hidden">
+                <div class="victory-bg"></div>
+                <div class="victory-content">
+                    <div class="victory-icon">🏆</div>
+                    <h2>SUMMIT REACHED!</h2>
+                    <div class="victory-subtitle">You conquered space!</div>
+                    
+                    <div class="victory-stats">
+                        <div class="victory-stat">
+                            <span class="stat-icon">🪙</span>
+                            <span class="stat-value" id="victory-coins">0</span>
+                            <span class="stat-label">COINS</span>
+                        </div>
+                        <div class="victory-stat">
+                            <span class="stat-icon">📏</span>
+                            <span class="stat-value" id="victory-height">0</span>
+                            <span class="stat-label">HEIGHT</span>
+                        </div>
+                        <div class="victory-stat">
+                            <span class="stat-icon">⚔️</span>
+                            <span class="stat-value" id="victory-difficulty">NORMAL</span>
+                            <span class="stat-label">DIFFICULTY</span>
+                        </div>
+                    </div>
+                    
+                    <div class="victory-bonus">
+                        <span>🎁 BONUS: +<span id="victory-bonus">10</span> coins!</span>
+                    </div>
+                    
+                    <button id="victory-btn">CONTINUE</button>
+                </div>
+                <div class="confetti">
+                    <span>🎉</span><span>⭐</span><span>🎊</span><span>✨</span><span>🌟</span>
+                    <span>🎉</span><span>⭐</span><span>🎊</span><span>✨</span><span>🌟</span>
+                </div>
+            </div>
+            
+            <div id="shop-screen" class="hidden">
+                <h2>SHOP</h2>
+                <p class="shop-balance">Your Coins: <span id="shop-coins">0</span></p>
+                
+                <div class="shop-items">
+                    <div class="shop-item" data-item="speed">
+                        <div class="item-icon">⚡</div>
+                        <div class="item-info">
+                            <h3>Speed Boost</h3>
+                            <p>Move 50% faster</p>
+                        </div>
+                        <button class="buy-btn" data-price="10">10 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="jump">
+                        <div class="item-icon">🦘</div>
+                        <div class="item-info">
+                            <h3>Super Jump</h3>
+                            <p>Jump 50% higher</p>
+                        </div>
+                        <button class="buy-btn" data-price="15">15 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="power">
+                        <div class="item-icon">👊</div>
+                        <div class="item-info">
+                            <h3>Power Punch</h3>
+                            <p>Deal 2x damage</p>
+                        </div>
+                        <button class="buy-btn" data-price="20">20 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="double-coins">
+                        <div class="item-icon">💰</div>
+                        <div class="item-info">
+                            <h3>Double Coins</h3>
+                            <p>Collect 2x coins!</p>
+                        </div>
+                        <button class="buy-btn" data-price="30">30 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="glow-mode">
+                        <div class="item-icon">✨</div>
+                        <div class="item-info">
+                            <h3>Glow Mode</h3>
+                            <p>Shine bright like a star!</p>
+                        </div>
+                        <button class="buy-btn" data-price="20">20 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="big-mode">
+                        <div class="item-icon">🦣</div>
+                        <div class="item-info">
+                            <h3>Big Mode</h3>
+                            <p>Become a giant!</p>
+                        </div>
+                        <button class="buy-btn" data-price="35">35 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="low-gravity">
+                        <div class="item-icon">🪶</div>
+                        <div class="item-info">
+                            <h3>Low Gravity</h3>
+                            <p>Float like a feather!</p>
+                        </div>
+                        <button class="buy-btn" data-price="25">25 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="shield">
+                        <div class="item-icon">🛡️</div>
+                        <div class="item-info">
+                            <h3>Shield</h3>
+                            <p>Block one hit in battle!</p>
+                        </div>
+                        <button class="buy-btn" data-price="15">15 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="trail-mode">
+                        <div class="item-icon">🌈</div>
+                        <div class="item-info">
+                            <h3>Rainbow Trail</h3>
+                            <p>Leave a colorful trail!</p>
+                        </div>
+                        <button class="buy-btn" data-price="30">30 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="tiny-mode">
+                        <div class="item-icon">🐜</div>
+                        <div class="item-info">
+                            <h3>Tiny Mode</h3>
+                            <p>Shrink to mini size!</p>
+                        </div>
+                        <button class="buy-btn" data-price="20">20 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="super-speed">
+                        <div class="item-icon">💨</div>
+                        <div class="item-info">
+                            <h3>Super Speed</h3>
+                            <p>Move 2x faster!</p>
+                        </div>
+                        <button class="buy-btn" data-price="40">40 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="moon-jump">
+                        <div class="item-icon">🌙</div>
+                        <div class="item-info">
+                            <h3>Moon Jump</h3>
+                            <p>Jump 2x higher!</p>
+                        </div>
+                        <button class="buy-btn" data-price="40">40 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="magnet">
+                        <div class="item-icon">🧲</div>
+                        <div class="item-info">
+                            <h3>Coin Magnet</h3>
+                            <p>Attract nearby coins!</p>
+                        </div>
+                        <button class="buy-btn" data-price="35">35 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="ghost-mode">
+                        <div class="item-icon">👻</div>
+                        <div class="item-info">
+                            <h3>Ghost Mode</h3>
+                            <p>Become see-through!</p>
+                        </div>
+                        <button class="buy-btn" data-price="25">25 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="spin-attack">
+                        <div class="item-icon">🌀</div>
+                        <div class="item-info">
+                            <h3>Spin Attack</h3>
+                            <p>Spin to deal damage!</p>
+                        </div>
+                        <button class="buy-btn" data-price="30">30 🪙</button>
+                    </div>
+                    
+                    <div class="shop-item" data-item="rocket-boots">
+                        <div class="item-icon">🚀</div>
+                        <div class="item-info">
+                            <h3>Rocket Boots</h3>
+                            <p>Double jump ability!</p>
+                        </div>
+                        <button class="buy-btn" data-price="50">50 🪙</button>
+                    </div>
+                </div>
+                
+                <button id="shop-close-btn">BACK</button>
+            </div>
+            
+            <!-- Career Screen -->
+            <div id="career-screen" class="hidden">
+                <h2>📊 CAREER STATS</h2>
+                <p class="menu-subtitle">Your achievements!</p>
+                
+                <div class="career-stats">
+                    <div class="career-section">
+                        <h3>💰 WEALTH</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Total Coins</span>
+                            <span class="stat-val" id="career-total-coins">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Coins Earned All-Time</span>
+                            <span class="stat-val" id="career-coins-earned">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>⚔️ BATTLE</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Battles Won</span>
+                            <span class="stat-val" id="career-battles-won">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Total Knockouts</span>
+                            <span class="stat-val" id="career-knockouts">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>🔫 BOX FIGHTS</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Wins</span>
+                            <span class="stat-val" id="career-boxfights-wins">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Kills</span>
+                            <span class="stat-val" id="career-boxfights-kills">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>🚀 JOURNEY</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Journeys Completed</span>
+                            <span class="stat-val" id="career-journeys">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Max Height Reached</span>
+                            <span class="stat-val" id="career-max-height">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>🏀 BASKETBALL</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Best Game Score</span>
+                            <span class="stat-val" id="career-basketball-best">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Total Hoops Made</span>
+                            <span class="stat-val" id="career-baskets">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Games Won</span>
+                            <span class="stat-val" id="career-basketball-wins">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>⚽ SOCCER</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Goals Scored</span>
+                            <span class="stat-val" id="career-goals">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Games Won</span>
+                            <span class="stat-val" id="career-soccer-wins">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>⛳ GOLF</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Best Score (Strokes)</span>
+                            <span class="stat-val" id="career-golf-best">--</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Holes Completed</span>
+                            <span class="stat-val" id="career-golf-holes">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>🏎️ RACING</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Races Won</span>
+                            <span class="stat-val" id="career-races-won">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Total Laps</span>
+                            <span class="stat-val" id="career-racing-laps">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="career-section">
+                        <h3>🎮 MINI GAMES</h3>
+                        <div class="stat-row">
+                            <span class="stat-name">Survival Best Wave</span>
+                            <span class="stat-val" id="career-survival-wave">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Target Practice Best</span>
+                            <span class="stat-val" id="career-target-best">0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-name">Speed Race Best Time</span>
+                            <span class="stat-val" id="career-speedrace-best">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button id="career-close-btn">BACK</button>
+            </div>
+            
+            <!-- Mini Games Screen -->
+            <div id="minigames-screen" class="hidden">
+                <h2>🎮 MINI GAMES</h2>
+                <p class="menu-subtitle">Choose a mini game!</p>
+                
+                <div class="menu-items">
+                    <button class="menu-item-btn" id="minigame-race">
+                        <span class="menu-icon">🏃</span>
+                        <span class="menu-text">Speed Race</span>
+                    </button>
+                    <button class="menu-item-btn" id="minigame-collect">
+                        <span class="menu-icon">⭐</span>
+                        <span class="menu-text">Coin Collector</span>
+                    </button>
+                    <button class="menu-item-btn" id="minigame-survival">
+                        <span class="menu-icon">💀</span>
+                        <span class="menu-text">Survival Mode</span>
+                    </button>
+                    <button class="menu-item-btn" id="minigame-target">
+                        <span class="menu-icon">🎯</span>
+                        <span class="menu-text">Target Practice</span>
+                    </button>
+                </div>
+                
+                <button id="minigames-close-btn">BACK</button>
+            </div>
+            
+            <!-- Sports Screen -->
+            <div id="sports-screen" class="hidden">
+                <h2>⚽ SPORTS</h2>
+                <p class="menu-subtitle">Pick a sport!</p>
+                
+                <div class="menu-items">
+                    <button class="menu-item-btn" id="sport-soccer">
+                        <span class="menu-icon">⚽</span>
+                        <span class="menu-text">Space Soccer</span>
+                    </button>
+                    <button class="menu-item-btn" id="sport-basketball">
+                        <span class="menu-icon">🏀</span>
+                        <span class="menu-text">Zero-G Basketball</span>
+                    </button>
+                    <button class="menu-item-btn" id="sport-golf">
+                        <span class="menu-icon">⛳</span>
+                        <span class="menu-text">Planet Golf</span>
+                    </button>
+                    <button class="menu-item-btn" id="sport-racing">
+                        <span class="menu-icon">🏎️</span>
+                        <span class="menu-text">Asteroid Racing</span>
+                    </button>
+                </div>
+                
+                <button id="sports-close-btn">BACK</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="game.js?v=60"></script>
+</body>
+</html>
+

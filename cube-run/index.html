@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cube Run</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <div class="title-screen" id="titleScreen">
+            <div class="title-content">
+                <div class="logo">
+                    <span class="cube-icon"></span>
+                    <h1>CUBE<br>RUN</h1>
+                </div>
+                <p class="tagline">Jump. Run. Survive.</p>
+                <button class="start-btn" id="startBtn">
+                    <span class="btn-text">START GAME</span>
+                    <span class="btn-shine"></span>
+                </button>
+                <button class="editor-btn" id="editorBtn">
+                    <span class="btn-text">🎨 BLOCK DESIGNER</span>
+                </button>
+                <div class="controls-hint">
+                    <div class="key">←→</div> Move
+                    <div class="key">SPACE</div> Jump
+                </div>
+            </div>
+            <div class="floating-blocks"></div>
+        </div>
+        
+        <!-- Block Designer Screen -->
+        <div class="editor-screen" id="editorScreen">
+            <div class="editor-header">
+                <button class="back-btn" id="backBtn">← BACK</button>
+                <h2>BLOCK DESIGNER</h2>
+                <div class="editor-actions">
+                    <button class="action-btn new-btn" id="newBlockBtn">+ NEW</button>
+                    <button class="action-btn" id="clearBtn">CLEAR</button>
+                    <button class="action-btn save-btn" id="saveBlockBtn">SAVE BLOCK</button>
+                </div>
+            </div>
+            
+            <div class="editor-main">
+                <div class="editor-left">
+                    <div class="pixel-grid-container">
+                        <canvas id="pixelCanvas" width="384" height="384"></canvas>
+                        <div class="grid-size-info">12×12 pixels per block</div>
+                    </div>
+                    
+                    <div class="tools-panel">
+                        <h3>TOOLS</h3>
+                        <div class="tool-buttons">
+                            <button class="tool-btn active" data-tool="pencil" title="Pencil">✏️</button>
+                            <button class="tool-btn" data-tool="eraser" title="Eraser">🧹</button>
+                            <button class="tool-btn" data-tool="fill" title="Fill">🪣</button>
+                            <button class="tool-btn" data-tool="picker" title="Color Picker">💉</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="editor-right">
+                    <div class="color-panel">
+                        <h3>COLORS</h3>
+                        <div class="current-color">
+                            <div class="color-preview" id="colorPreview"></div>
+                            <input type="color" id="colorInput" value="#ff6b6b">
+                        </div>
+                        <div class="color-palette" id="colorPalette"></div>
+                    </div>
+                    
+                    <div class="block-settings">
+                        <h3>BLOCK SETTINGS</h3>
+                        <div class="setting-row">
+                            <label>Block Name:</label>
+                            <input type="text" id="blockName" placeholder="My Block" maxlength="20">
+                        </div>
+                        <div class="setting-row">
+                            <label>Block Type:</label>
+                            <select id="blockBehavior">
+                                <option value="solid">Solid (walkable)</option>
+                                <option value="hazard">Hazard (deadly)</option>
+                                <option value="bouncy">Bouncy (spring)</option>
+                                <option value="slippery">Slippery (ice)</option>
+                                <option value="decoration">Decoration (no collision)</option>
+                            </select>
+                        </div>
+                        <div class="setting-row">
+                            <label>Block Key:</label>
+                            <input type="text" id="blockKey" placeholder="X" maxlength="1" style="width: 50px; text-align: center; text-transform: uppercase;">
+                            <span class="hint">Use in level editor</span>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-panel">
+                        <h3>PREVIEW</h3>
+                        <div class="preview-container">
+                            <canvas id="previewCanvas" width="48" height="48"></canvas>
+                            <canvas id="previewCanvasLarge" width="96" height="96"></canvas>
+                        </div>
+                        <div class="editing-indicator" id="editingIndicator">
+                            <span class="editing-dot"></span>
+                            <span class="editing-text">New Block</span>
+                        </div>
+                    </div>
+                    
+                    <div class="saved-blocks-panel">
+                        <h3>MY BLOCKS <span class="block-count" id="blockCount">(0)</span></h3>
+                        <div class="saved-blocks" id="savedBlocks"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-screen" id="gameScreen">
+            <div class="game-hud">
+                <div class="hud-item">
+                    <span class="hud-label">COINS</span>
+                    <span class="hud-value" id="coinCount">0</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">LEVEL</span>
+                    <span class="hud-value" id="levelNum">1</span>
+                </div>
+                <div class="hud-item">
+                    <span class="hud-label">LIVES</span>
+                    <span class="hud-value" id="livesCount">❤️❤️❤️</span>
+                </div>
+            </div>
+            <canvas id="gameCanvas"></canvas>
+            <div class="level-complete" id="levelComplete">
+                <h2>LEVEL COMPLETE!</h2>
+                <button class="next-btn" id="nextBtn">NEXT LEVEL</button>
+            </div>
+            <div class="game-over" id="gameOver">
+                <h2>GAME OVER</h2>
+                <button class="retry-btn" id="retryBtn">TRY AGAIN</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="game.js"></script>
+</body>
+</html>
+
