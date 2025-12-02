@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Plane Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#228B22">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+    <div id="mainMenu">
+        <h1>Plane Guide</h1>
+        <button id="startBtn">Play Game</button>
+    </div>
+    <canvas id="gameCanvas" class="hidden"></canvas>
+    <div id="ui" class="hidden">
+        <div id="score">Score: 0</div>
+        <div id="gameOver" class="hidden">
+            <h1>Game Over</h1>
+            <p>Score: <span id="finalScore">0</span></p>
+            <button id="restartBtn">Restart</button>
+            <button id="menuBtn">Main Menu</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker failed', err));
+        }
+    </script>
+</body>
+</html>

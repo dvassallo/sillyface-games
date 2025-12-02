@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Pixel Editor - 16x16</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #e8e8e8;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 0 0 20px rgba(100, 200, 255, 0.5);
+            background: linear-gradient(90deg, #64b5f6, #81c784);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .editor-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .canvas-container {
+            position: relative;
+        }
+
+        #pixelCanvas {
+            border: 2px solid #444;
+            border-radius: 8px;
+            cursor: crosshair;
+            image-rendering: pixelated;
+            background: repeating-conic-gradient(#333 0% 25%, #222 0% 50%) 50% / 32px 32px;
+        }
+
+        .tools-section {
+            width: 320px;
+        }
+
+        .section-title {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            color: #81c784;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+        }
+
+        .color-picker-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        #colorPicker {
+            width: 60px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: none;
+        }
+
+        #colorPicker::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+
+        #colorPicker::-webkit-color-swatch {
+            border: 2px solid #555;
+            border-radius: 6px;
+        }
+
+        #hexInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #fff;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .current-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #555;
+        }
+
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            margin-bottom: 20px;
+        }
+
+        .palette-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .palette-color:hover {
+            transform: scale(1.15);
+            border-color: #fff;
+        }
+
+        .palette-color.selected {
+            border-color: #64b5f6;
+            box-shadow: 0 0 10px rgba(100, 181, 246, 0.5);
+        }
+
+        .tool-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tool-btn {
+            padding: 12px 16px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #e8e8e8;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tool-btn:hover {
+            background: rgba(100, 181, 246, 0.2);
+            border-color: #64b5f6;
+        }
+
+        .tool-btn.active {
+            background: rgba(100, 181, 246, 0.3);
+            border-color: #64b5f6;
+        }
+
+        .tool-btn.danger:hover {
+            background: rgba(255, 100, 100, 0.2);
+            border-color: #ff6b6b;
+        }
+
+        .preview-section {
+            margin-top: 20px;
+        }
+
+        .preview-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .preview-box {
+            border: 2px solid #444;
+            border-radius: 4px;
+            image-rendering: pixelated;
+        }
+
+        .preview-label {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .import-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 200, 100, 0.1);
+            border: 2px solid #81c784;
+            border-radius: 12px;
+        }
+
+        .import-section .section-title {
+            color: #81c784;
+            margin-bottom: 15px;
+        }
+
+        #blockSelect {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            max-height: 200px;
+        }
+
+        #blockSelect option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        #blockSelect optgroup {
+            background: #0f3460;
+            color: #81c784;
+            font-weight: bold;
+        }
+
+        .import-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #81c784, #66bb6a);
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .import-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(129, 199, 132, 0.4);
+        }
+
+        .import-btn.reset {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+        }
+
+        .import-btn.reset:hover {
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .status-message {
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .status-message.success {
+            display: block;
+            background: rgba(129, 199, 132, 0.2);
+            color: #81c784;
+            border: 1px solid #81c784;
+        }
+
+        .status-message.error {
+            display: block;
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+            border: 1px solid #ff6b6b;
+        }
+
+        .grid-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #888;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #64b5f6;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background-color: #fff;
+        }
+
+        .shortcuts {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .shortcuts h4 {
+            color: #81c784;
+            margin-bottom: 10px;
+        }
+
+        .shortcut-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #888;
+        }
+
+        .shortcut-key {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .custom-blocks-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .custom-block-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            margin-bottom: 5px;
+        }
+
+        .custom-block-item canvas {
+            border: 1px solid #444;
+            border-radius: 4px;
+            image-rendering: pixelated;
+        }
+
+        .custom-block-item .name {
+            flex: 1;
+            margin-left: 10px;
+            font-size: 12px;
+        }
+
+        .custom-block-item .remove-btn {
+            background: rgba(255, 100, 100, 0.3);
+            border: none;
+            color: #ff6b6b;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .history-info {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .load-block-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .load-block-btn {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #64b5f6;
+            border-radius: 8px;
+            background: rgba(100, 181, 246, 0.1);
+            color: #64b5f6;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .load-block-btn:hover {
+            background: rgba(100, 181, 246, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Block & Item Editor</h1>
+        <p class="subtitle">Design your own 16×16 textures for blocks and items</p>
+
+        <div class="main-layout">
+            <div class="editor-section canvas-container">
+                <canvas id="pixelCanvas" width="512" height="512"></canvas>
+            </div>
+
+            <div class="editor-section tools-section">
+                <h3 class="section-title">🎨 Color</h3>
+                
+                <div class="color-picker-row">
+                    <input type="color" id="colorPicker" value="#4a8a4a">
+                    <input type="text" id="hexInput" value="#4a8a4a" maxlength="7">
+                    <div class="current-color" id="currentColorPreview" style="background: #4a8a4a;"></div>
+                </div>
+
+                <div class="palette" id="palette"></div>
+
+                <h3 class="section-title">🔧 Tools</h3>
+                
+                <div class="tool-buttons">
+                    <button class="tool-btn active" id="brushTool" onclick="setTool('brush')">✏️ Brush</button>
+                    <button class="tool-btn" id="eraserTool" onclick="setTool('eraser')">🧹 Eraser</button>
+                    <button class="tool-btn" id="fillTool" onclick="setTool('fill')">🪣 Fill</button>
+                    <button class="tool-btn" id="pickerTool" onclick="setTool('picker')">💉 Pick</button>
+                    <button class="tool-btn" onclick="undo()">↩️ Undo</button>
+                    <button class="tool-btn" onclick="redo()">↪️ Redo</button>
+                    <button class="tool-btn danger" onclick="clearCanvas()">🗑️ Clear</button>
+                    <button class="tool-btn" onclick="fillAll()">📦 Fill All</button>
+                </div>
+
+                <div class="grid-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="gridToggle" checked onchange="toggleGrid()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Show Grid</span>
+                </div>
+
+                <h3 class="section-title">👁️ Preview</h3>
+                <div class="preview-section">
+                    <div class="preview-row">
+                        <div>
+                            <canvas id="preview32" class="preview-box" width="32" height="32"></canvas>
+                            <div class="preview-label">32px</div>
+                        </div>
+                        <div>
+                            <canvas id="preview64" class="preview-box" width="64" height="64"></canvas>
+                            <div class="preview-label">64px</div>
+                        </div>
+                        <div>
+                            <canvas id="preview128" class="preview-box" width="128" height="128"></canvas>
+                            <div class="preview-label">128px</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="import-section">
+                    <h3 class="section-title">🎮 Import to Game</h3>
+                    
+                    <label style="color: #888; font-size: 12px; margin-bottom: 5px; display: block;">Select block or item to replace:</label>
+                    <select id="blockSelect">
+                        <optgroup label="── Natural Blocks ──">
+                            <option value="1">Dirt</option>
+                            <option value="2">Grass</option>
+                            <option value="3">Stone</option>
+                            <option value="44">Sand</option>
+                            <option value="45">Gravel</option>
+                            <option value="34">Snow</option>
+                        </optgroup>
+                        <optgroup label="── Wood & Plants ──">
+                            <option value="4">Oak Wood</option>
+                            <option value="5">Oak Leaves</option>
+                            <option value="41">Birch Wood</option>
+                            <option value="42">Birch Leaves</option>
+                            <option value="22">Vine</option>
+                        </optgroup>
+                        <optgroup label="── Building Blocks ──">
+                            <option value="37">Cobblestone</option>
+                            <option value="17">Mossy Cobblestone</option>
+                            <option value="8">Oak Planks</option>
+                            <option value="43">Birch Planks</option>
+                            <option value="15">Wool</option>
+                            <option value="46">Glass</option>
+                            <option value="35">Iron Block</option>
+                            <option value="36">Gold Block</option>
+                            <option value="31">Copper Block</option>
+                        </optgroup>
+                        <optgroup label="── Ores ──">
+                            <option value="6">Coal Ore</option>
+                            <option value="7">Iron Ore</option>
+                            <option value="27">Gold Ore</option>
+                            <option value="28">Copper Ore</option>
+                        </optgroup>
+                        <optgroup label="── Utility Blocks ──">
+                            <option value="9">Crafting Table</option>
+                            <option value="13">Furnace</option>
+                            <option value="40">Chest</option>
+                            <option value="18">Spawner</option>
+                            <option value="60">Torch</option>
+                        </optgroup>
+                        <optgroup label="── Pickaxes ──">
+                            <option value="11">Wooden Pickaxe</option>
+                            <option value="12">Stone Pickaxe</option>
+                            <option value="29">Iron Pickaxe</option>
+                        </optgroup>
+                        <optgroup label="── Shovels ──">
+                            <option value="52">Wooden Shovel</option>
+                            <option value="53">Stone Shovel</option>
+                            <option value="54">Iron Shovel</option>
+                        </optgroup>
+                        <optgroup label="── Swords ──">
+                            <option value="49">Wooden Sword</option>
+                            <option value="50">Stone Sword</option>
+                            <option value="51">Iron Sword</option>
+                        </optgroup>
+                        <optgroup label="── Armor ──">
+                            <option value="56">Iron Helmet</option>
+                            <option value="57">Iron Chestplate</option>
+                            <option value="58">Iron Leggings</option>
+                            <option value="59">Iron Boots</option>
+                        </optgroup>
+                        <optgroup label="── Ranged Weapons ──">
+                            <option value="19">Bow</option>
+                            <option value="39">Arrow</option>
+                            <option value="55">Snowball</option>
+                        </optgroup>
+                        <optgroup label="── Tools & Items ──">
+                            <option value="16">Shears</option>
+                            <option value="48">Flint and Steel</option>
+                            <option value="47">Flint</option>
+                            <option value="10">Stick</option>
+                            <option value="23">String</option>
+                            <option value="38">Bone</option>
+                        </optgroup>
+                        <optgroup label="── Materials ──">
+                            <option value="14">Iron Ingot</option>
+                            <option value="32">Gold Ingot</option>
+                            <option value="30">Copper Ingot</option>
+                        </optgroup>
+                        <optgroup label="── Food ──">
+                            <option value="20">Apple</option>
+                            <option value="33">Golden Apple</option>
+                            <option value="25">Raw Meat</option>
+                            <option value="26">Cooked Meat</option>
+                            <option value="24">Spider Eye</option>
+                        </optgroup>
+                    </select>
+                    
+                    <button class="import-btn" onclick="importToGame()">
+                        ✨ Apply to Game
+                    </button>
+                    
+                    <button class="import-btn reset" onclick="resetAllBlocks()">
+                        🔄 Reset All Textures
+                    </button>
+                    
+                    <div id="statusMessage" class="status-message"></div>
+
+                    <div class="load-block-section">
+                        <button class="load-block-btn" onclick="loadBlockTexture()">
+                            📥 Load Selected to Edit
+                        </button>
+                    </div>
+
+                    <div class="custom-blocks-list" id="customBlocksList">
+                        <!-- Custom blocks will be listed here -->
+                    </div>
+                </div>
+
+                <div class="shortcuts">
+                    <h4>⌨️ Shortcuts</h4>
+                    <div class="shortcut-row"><span>Brush</span><span class="shortcut-key">B</span></div>
+                    <div class="shortcut-row"><span>Eraser</span><span class="shortcut-key">E</span></div>
+                    <div class="shortcut-row"><span>Fill</span><span class="shortcut-key">F</span></div>
+                    <div class="shortcut-row"><span>Color Picker</span><span class="shortcut-key">I</span></div>
+                    <div class="shortcut-row"><span>Undo</span><span class="shortcut-key">Ctrl+Z</span></div>
+                    <div class="shortcut-row"><span>Redo</span><span class="shortcut-key">Ctrl+Y</span></div>
+                </div>
+
+                <div class="history-info" id="historyInfo">History: 0/0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('pixelCanvas');
+        const ctx = canvas.getContext('2d');
+        const GRID_SIZE = 16;
+        const PIXEL_SIZE = canvas.width / GRID_SIZE;
+
+        let pixels = [];
+        let currentColor = '#4a8a4a';
+        let currentTool = 'brush';
+        let isDrawing = false;
+        let showGrid = true;
+        let history = [];
+        let historyIndex = -1;
+        const MAX_HISTORY = 50;
+
+        // Block name mapping - matches BLOCK constants in game.js
+        const blockNames = {
+            1: 'Dirt', 2: 'Grass', 3: 'Stone', 4: 'Oak Wood', 5: 'Oak Leaves',
+            6: 'Coal Ore', 7: 'Iron Ore', 8: 'Oak Planks', 9: 'Crafting Table',
+            10: 'Stick', 11: 'Wooden Pickaxe', 12: 'Stone Pickaxe', 13: 'Furnace',
+            14: 'Iron Ingot', 15: 'Wool', 16: 'Shears', 17: 'Mossy Cobblestone',
+            18: 'Spawner', 19: 'Bow', 20: 'Apple', 21: 'Water', 22: 'Vine',
+            23: 'String', 24: 'Spider Eye', 25: 'Raw Meat', 26: 'Cooked Meat',
+            27: 'Gold Ore', 28: 'Copper Ore', 29: 'Iron Pickaxe', 30: 'Copper Ingot',
+            31: 'Copper Block', 32: 'Gold Ingot', 33: 'Golden Apple', 34: 'Snow',
+            35: 'Iron Block', 36: 'Gold Block', 37: 'Cobblestone', 38: 'Bone',
+            39: 'Arrow', 40: 'Chest', 41: 'Birch Wood', 42: 'Birch Leaves',
+            43: 'Birch Planks', 44: 'Sand', 45: 'Gravel', 46: 'Glass',
+            47: 'Flint', 48: 'Flint and Steel', 49: 'Wooden Sword', 50: 'Stone Sword',
+            51: 'Iron Sword', 52: 'Wooden Shovel', 53: 'Stone Shovel',
+            54: 'Iron Shovel', 55: 'Snowball', 56: 'Iron Helmet',
+            57: 'Iron Chestplate', 58: 'Iron Leggings', 59: 'Iron Boots',
+            60: 'Torch'
+        };
+
+        // Minecraft-inspired palette
+        const palette = [
+            // Grays
+            '#ffffff', '#c0c0c0', '#808080', '#404040', '#202020', '#000000', '#f5f5dc', '#d4d4aa',
+            // Browns
+            '#8B4513', '#A0522D', '#6B4423', '#5a3a0a', '#8a6a3a', '#CD853F', '#DEB887', '#D2B48C',
+            // Greens
+            '#228B22', '#32CD32', '#4a8a4a', '#2a5a2a', '#3a5a3a', '#6B8E23', '#556B2F', '#8FBC8F',
+            // Blues
+            '#1E90FF', '#4169E1', '#3a7ca5', '#1a4c75', '#87CEEB', '#4682B4', '#5F9EA0', '#00CED1',
+            // Reds/Oranges
+            '#FF0000', '#DC143C', '#B22222', '#8B0000', '#FF4500', '#FF6347', '#FF7F50', '#FFA500',
+            // Yellows
+            '#FFD700', '#FFFF00', '#F0E68C', '#BDB76B', '#DAA520', '#B8860B', '#FFE4B5', '#FFEFD5',
+            // Purples/Pinks
+            '#800080', '#9932CC', '#8B008B', '#FF00FF', '#DA70D6', '#EE82EE', '#DDA0DD', '#FFC0CB',
+            // Others
+            '#00FF00', '#00FA9A', '#00FF7F', '#7CFC00', '#7FFF00', '#ADFF2F', '#9ACD32', '#6B8E23'
+        ];
+
+        // Initialize
+        function init() {
+            // Create empty pixel grid
+            for (let y = 0; y < GRID_SIZE; y++) {
+                pixels[y] = [];
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    pixels[y][x] = null; // null = transparent
+                }
+            }
+
+            // Build palette
+            const paletteEl = document.getElementById('palette');
+            palette.forEach(color => {
+                const div = document.createElement('div');
+                div.className = 'palette-color';
+                div.style.background = color;
+                div.onclick = () => setColor(color);
+                paletteEl.appendChild(div);
+            });
+
+            // Event listeners
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+            document.getElementById('colorPicker').addEventListener('input', e => setColor(e.target.value));
+            document.getElementById('hexInput').addEventListener('input', e => {
+                if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
+                    setColor(e.target.value);
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', e => {
+                if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
+                else if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+                else if (e.key === 'b') setTool('brush');
+                else if (e.key === 'e') setTool('eraser');
+                else if (e.key === 'f') setTool('fill');
+                else if (e.key === 'i') setTool('picker');
+            });
+
+            saveState();
+            render();
+            updateCustomBlocksList();
+        }
+
+        function setColor(color) {
+            currentColor = color;
+            document.getElementById('colorPicker').value = color;
+            document.getElementById('hexInput').value = color;
+            document.getElementById('currentColorPreview').style.background = color;
+            
+            // Update palette selection
+            document.querySelectorAll('.palette-color').forEach(el => {
+                el.classList.toggle('selected', el.style.background === color || 
+                    rgbToHex(el.style.background) === color.toLowerCase());
+            });
+        }
+
+        function rgbToHex(rgb) {
+            if (rgb.startsWith('#')) return rgb.toLowerCase();
+            const match = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
+            if (!match) return rgb;
+            return '#' + [match[1], match[2], match[3]].map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            }).join('');
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            const toolBtn = document.getElementById(tool + 'Tool');
+            if (toolBtn) toolBtn.classList.add('active');
+            
+            canvas.style.cursor = tool === 'picker' ? 'crosshair' : 
+                                  tool === 'fill' ? 'cell' : 'crosshair';
+        }
+
+        function getPixelCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const x = Math.floor((e.clientX - rect.left) / PIXEL_SIZE);
+            const y = Math.floor((e.clientY - rect.top) / PIXEL_SIZE);
+            return { x: Math.max(0, Math.min(GRID_SIZE - 1, x)), y: Math.max(0, Math.min(GRID_SIZE - 1, y)) };
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const { x, y } = getPixelCoords(e);
+            
+            if (currentTool === 'fill') {
+                floodFill(x, y, pixels[y][x], e.button === 2 ? null : currentColor);
+                saveState();
+            } else if (currentTool === 'picker') {
+                if (pixels[y][x]) {
+                    setColor(pixels[y][x]);
+                }
+            } else {
+                applyTool(x, y, e.button === 2);
+            }
+            render();
+        }
+
+        function draw(e) {
+            if (!isDrawing || currentTool === 'fill' || currentTool === 'picker') return;
+            const { x, y } = getPixelCoords(e);
+            applyTool(x, y, e.buttons === 2);
+            render();
+        }
+
+        function stopDrawing() {
+            if (isDrawing && currentTool !== 'fill' && currentTool !== 'picker') {
+                saveState();
+            }
+            isDrawing = false;
+        }
+
+        function applyTool(x, y, rightClick) {
+            if (currentTool === 'brush') {
+                pixels[y][x] = rightClick ? null : currentColor;
+            } else if (currentTool === 'eraser') {
+                pixels[y][x] = null;
+            }
+        }
+
+        function floodFill(x, y, targetColor, newColor) {
+            if (x < 0 || x >= GRID_SIZE || y < 0 || y >= GRID_SIZE) return;
+            if (pixels[y][x] !== targetColor) return;
+            if (pixels[y][x] === newColor) return;
+
+            pixels[y][x] = newColor;
+            floodFill(x + 1, y, targetColor, newColor);
+            floodFill(x - 1, y, targetColor, newColor);
+            floodFill(x, y + 1, targetColor, newColor);
+            floodFill(x, y - 1, targetColor, newColor);
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw pixels
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    if (pixels[y][x]) {
+                        ctx.fillStyle = pixels[y][x];
+                        ctx.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
+                    }
+                }
+            }
+
+            // Draw grid
+            if (showGrid) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= GRID_SIZE; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * PIXEL_SIZE, 0);
+                    ctx.lineTo(i * PIXEL_SIZE, canvas.height);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * PIXEL_SIZE);
+                    ctx.lineTo(canvas.width, i * PIXEL_SIZE);
+                    ctx.stroke();
+                }
+            }
+
+            updatePreviews();
+        }
+
+        function updatePreviews() {
+            [32, 64, 128].forEach(size => {
+                const previewCanvas = document.getElementById('preview' + size);
+                const pCtx = previewCanvas.getContext('2d');
+                pCtx.imageSmoothingEnabled = false;
+                pCtx.clearRect(0, 0, size, size);
+                
+                const pixelSize = size / GRID_SIZE;
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        if (pixels[y][x]) {
+                            pCtx.fillStyle = pixels[y][x];
+                            pCtx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                        }
+                    }
+                }
+            });
+        }
+
+        function toggleGrid() {
+            showGrid = document.getElementById('gridToggle').checked;
+            render();
+        }
+
+        function clearCanvas() {
+            if (confirm('Clear the entire canvas?')) {
+                for (let y = 0; y < GRID_SIZE; y++) {
+                    for (let x = 0; x < GRID_SIZE; x++) {
+                        pixels[y][x] = null;
+                    }
+                }
+                saveState();
+                render();
+            }
+        }
+
+        function fillAll() {
+            for (let y = 0; y < GRID_SIZE; y++) {
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    pixels[y][x] = currentColor;
+                }
+            }
+            saveState();
+            render();
+        }
+
+        function saveState() {
+            // Remove any redo states
+            history = history.slice(0, historyIndex + 1);
+            
+            // Deep copy pixels
+            const state = pixels.map(row => [...row]);
+            history.push(state);
+            
+            // Limit history
+            if (history.length > MAX_HISTORY) {
+                history.shift();
+            } else {
+                historyIndex++;
+            }
+            
+            updateHistoryInfo();
+        }
+
+        function undo() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                pixels = history[historyIndex].map(row => [...row]);
+                render();
+                updateHistoryInfo();
+            }
+        }
+
+        function redo() {
+            if (historyIndex < history.length - 1) {
+                historyIndex++;
+                pixels = history[historyIndex].map(row => [...row]);
+                render();
+                updateHistoryInfo();
+            }
+        }
+
+        function updateHistoryInfo() {
+            document.getElementById('historyInfo').textContent = 
+                `History: ${historyIndex + 1}/${history.length}`;
+        }
+
+        // ==================== GAME IMPORT FUNCTIONS ====================
+        
+        function importToGame() {
+            const blockId = parseInt(document.getElementById('blockSelect').value);
+            const blockName = blockNames[blockId] || `Block ${blockId}`;
+            
+            // Check if canvas has any content
+            let hasContent = false;
+            for (let y = 0; y < GRID_SIZE && !hasContent; y++) {
+                for (let x = 0; x < GRID_SIZE && !hasContent; x++) {
+                    if (pixels[y][x]) hasContent = true;
+                }
+            }
+            
+            if (!hasContent) {
+                showStatus('Please draw something first!', 'error');
+                return;
+            }
+            
+            // Get custom blocks from localStorage
+            let customBlocks = {};
+            try {
+                const saved = localStorage.getItem('crafterCustomBlocks');
+                if (saved) customBlocks = JSON.parse(saved);
+            } catch (e) {}
+            
+            // Create a pre-rendered canvas for performance
+            const cacheCanvas = document.createElement('canvas');
+            cacheCanvas.width = 32;
+            cacheCanvas.height = 32;
+            const cacheCtx = cacheCanvas.getContext('2d');
+            cacheCtx.imageSmoothingEnabled = false;
+            
+            const pixelSize = 32 / 16;
+            for (let py = 0; py < 16; py++) {
+                for (let px = 0; px < 16; px++) {
+                    if (pixels[py][px]) {
+                        cacheCtx.fillStyle = pixels[py][px];
+                        cacheCtx.fillRect(px * pixelSize, py * pixelSize, pixelSize, pixelSize);
+                    }
+                }
+            }
+            
+            // Save the pixel data AND the cached image
+            customBlocks[blockId] = {
+                name: blockName,
+                pixels: pixels.map(row => [...row]),
+                imageData: cacheCanvas.toDataURL('image/png'),
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('crafterCustomBlocks', JSON.stringify(customBlocks));
+            
+            showStatus(`✓ "${blockName}" saved! Reload the game to see changes.`, 'success');
+            updateCustomBlocksList();
+        }
+        
+        function resetAllBlocks() {
+            if (confirm('Reset all custom textures to default?')) {
+                localStorage.removeItem('crafterCustomBlocks');
+                showStatus('✓ All textures reset! Reload the game.', 'success');
+                updateCustomBlocksList();
+            }
+        }
+        
+        function removeCustomBlock(blockId) {
+            let customBlocks = {};
+            try {
+                const saved = localStorage.getItem('crafterCustomBlocks');
+                if (saved) customBlocks = JSON.parse(saved);
+            } catch (e) {}
+            
+            delete customBlocks[blockId];
+            localStorage.setItem('crafterCustomBlocks', JSON.stringify(customBlocks));
+            showStatus('✓ Texture removed! Reload the game.', 'success');
+            updateCustomBlocksList();
+        }
+        
+        function loadBlockTexture() {
+            const blockId = parseInt(document.getElementById('blockSelect').value);
+            
+            // Check if there's a custom texture for this block
+            let customBlocks = {};
+            try {
+                const saved = localStorage.getItem('crafterCustomBlocks');
+                if (saved) customBlocks = JSON.parse(saved);
+            } catch (e) {}
+            
+            if (customBlocks[blockId]) {
+                pixels = customBlocks[blockId].pixels.map(row => [...row]);
+                saveState();
+                render();
+                showStatus(`✓ Loaded "${blockNames[blockId]}" texture`, 'success');
+            } else {
+                showStatus(`No custom texture for "${blockNames[blockId]}"`, 'error');
+            }
+        }
+        
+        function updateCustomBlocksList() {
+            const listEl = document.getElementById('customBlocksList');
+            let customBlocks = {};
+            
+            try {
+                const saved = localStorage.getItem('crafterCustomBlocks');
+                if (saved) customBlocks = JSON.parse(saved);
+            } catch (e) {}
+            
+            const entries = Object.entries(customBlocks);
+            
+            if (entries.length === 0) {
+                listEl.innerHTML = '<div style="color: #666; text-align: center; padding: 10px;">No custom textures yet</div>';
+                return;
+            }
+            
+            listEl.innerHTML = '<div style="color: #888; font-size: 11px; margin-bottom: 8px;">Custom Textures (' + entries.length + '):</div>';
+            
+            entries.forEach(([blockId, data]) => {
+                const item = document.createElement('div');
+                item.className = 'custom-block-item';
+                
+                // Create mini preview
+                const previewCanvas = document.createElement('canvas');
+                previewCanvas.width = 24;
+                previewCanvas.height = 24;
+                const pCtx = previewCanvas.getContext('2d');
+                pCtx.imageSmoothingEnabled = false;
+                
+                const pixelSize = 24 / 16;
+                for (let y = 0; y < 16; y++) {
+                    for (let x = 0; x < 16; x++) {
+                        if (data.pixels[y] && data.pixels[y][x]) {
+                            pCtx.fillStyle = data.pixels[y][x];
+                            pCtx.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                        }
+                    }
+                }
+                
+                item.appendChild(previewCanvas);
+                
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = data.name;
+                item.appendChild(nameSpan);
+                
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '✕';
+                removeBtn.onclick = () => removeCustomBlock(blockId);
+                item.appendChild(removeBtn);
+                
+                listEl.appendChild(item);
+            });
+        }
+        
+        function showStatus(message, type) {
+            const el = document.getElementById('statusMessage');
+            el.textContent = message;
+            el.className = 'status-message ' + type;
+            
+            setTimeout(() => {
+                el.className = 'status-message';
+            }, 4000);
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crafter: A New World</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen active">
+        <div class="menu-background">
+            <div class="floating-blocks"></div>
+        </div>
+        <div class="menu-content">
+            <h1 class="game-title">
+                <span class="title-crafter">Crafter</span>
+                <span class="title-subtitle">A New World</span>
+            </h1>
+            <div class="menu-buttons">
+                <button class="menu-btn primary" id="btn-new-world-survival">
+                    <span class="btn-text">New World (Survival)</span>
+                </button>
+                <button class="menu-btn creative" id="btn-new-world-creative">
+                    <span class="btn-text">New World (Creative)</span>
+                </button>
+                <button class="menu-btn" id="btn-join-world" disabled>
+                    <span class="btn-text">Join World</span>
+                    <span class="btn-hint">(No saved world)</span>
+                </button>
+                <button class="menu-btn" id="btn-settings">
+                    <span class="btn-text">Settings</span>
+                </button>
+                <button class="menu-btn coming-soon" id="btn-multiplayer">
+                    <span class="btn-text">Multiplayer</span>
+                    <span class="btn-hint">(Coming Soon)</span>
+                </button>
+                <button class="menu-btn coming-soon" id="btn-speedrun">
+                    <span class="btn-text">Speedrun</span>
+                    <span class="btn-hint">(Coming Soon)</span>
+                </button>
+            </div>
+            <p class="version-text">v0.1.0 Alpha</p>
+        </div>
+    </div>
+
+    <!-- Settings Menu -->
+    <div id="settings-menu" class="screen">
+        <div class="menu-background darker"></div>
+        <div class="settings-content">
+            <h2 class="settings-title">Settings</h2>
+            <div class="settings-panel">
+                <div class="settings-section">
+                    <h3>Controls</h3>
+                    <div class="control-item">
+                        <span class="control-label">Move Left</span>
+                        <button class="key-bind" data-action="left">A</button>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Move Right</span>
+                        <button class="key-bind" data-action="right">D</button>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Jump</span>
+                        <button class="key-bind" data-action="jump">SPACE</button>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Inventory</span>
+                        <button class="key-bind" data-action="inventory">E</button>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Break Block</span>
+                        <button class="key-bind" data-action="break">LEFT CLICK</button>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Place Block</span>
+                        <button class="key-bind" data-action="place">RIGHT CLICK</button>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Audio</h3>
+                    <div class="control-item">
+                        <span class="control-label">Music Volume</span>
+                        <input type="range" id="music-volume" min="0" max="100" value="50">
+                    </div>
+                    <div class="control-item">
+                        <span class="control-label">Sound Effects</span>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="70">
+                    </div>
+                </div>
+            </div>
+            <button class="menu-btn back-btn" id="btn-settings-back">
+                <span class="btn-text">Back to Menu</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <canvas id="game-canvas"></canvas>
+        <div class="coordinates" id="coordinates">
+            <span>X: <span id="coord-x">0</span></span>
+            <span>Y: <span id="coord-y">0</span></span>
+        </div>
+        <div id="game-ui">
+            <div class="health-bar" id="health-bar">
+                <!-- Hearts will be generated by JS -->
+            </div>
+            <div class="hotbar">
+                <div class="hotbar-slot selected" data-slot="0">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="1">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="2">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="3">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="4">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="5">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="6">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="7">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="8">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+                <div class="hotbar-slot" data-slot="9">
+                    <div class="block-preview" style="display:none;"></div>
+                </div>
+            </div>
+        </div>
+        <button class="pause-btn" id="btn-pause">⏸️</button>
+        <div class="game-mode-indicator" id="game-mode-indicator"></div>
+        <!-- Pause Menu -->
+        <div id="pause-menu" class="overlay hidden">
+            <div class="pause-content">
+                <h2>Paused</h2>
+                <button class="menu-btn" id="btn-resume">Resume</button>
+                <button class="menu-btn" id="btn-save">Save World</button>
+                <button class="menu-btn" id="btn-quit">Quit to Menu</button>
+            </div>
+        </div>
+        <!-- Game Over Menu -->
+        <div id="gameover-menu" class="overlay hidden">
+            <div class="gameover-content">
+                <h2 class="gameover-title">GAME OVER</h2>
+                <p class="gameover-message">You fell into the void...</p>
+                <div class="gameover-buttons">
+                    <button class="menu-btn primary" id="btn-respawn">Respawn</button>
+                    <button class="menu-btn" id="btn-gameover-quit">Quit to Menu</button>
+                </div>
+            </div>
+        </div>
+        <!-- Furnace UI -->
+        <div id="furnace-overlay" class="overlay hidden">
+            <div class="furnace-container">
+                <div class="furnace-header">
+                    <h2>Furnace</h2>
+                    <span class="furnace-hint">Press E to close</span>
+                </div>
+                <div class="furnace-main">
+                    <div class="furnace-slots">
+                        <div class="furnace-input-section">
+                            <span class="slot-label">Input</span>
+                            <div class="furnace-slot" id="furnace-input"></div>
+                        </div>
+                        <div class="furnace-fuel-section">
+                            <span class="slot-label">Fuel</span>
+                            <div class="furnace-slot" id="furnace-fuel"></div>
+                            <div class="fuel-bar-container">
+                                <div class="fuel-bar" id="fuel-bar"></div>
+                            </div>
+                        </div>
+                        <div class="furnace-arrow">
+                            <div class="smelt-progress" id="smelt-progress"></div>
+                            →
+                        </div>
+                        <div class="furnace-output-section">
+                            <span class="slot-label">Output</span>
+                            <div class="furnace-slot result-slot" id="furnace-output"></div>
+                        </div>
+                    </div>
+                    <div class="furnace-inventory">
+                        <h3>Inventory</h3>
+                        <div class="furnace-inv-grid" id="furnace-inv-grid"></div>
+                        <div class="furnace-hotbar" id="furnace-hotbar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Chest UI -->
+        <div id="chest-overlay" class="overlay hidden">
+            <div class="chest-container">
+                <div class="chest-header">
+                    <h2>Chest</h2>
+                    <span class="chest-hint">Press E to close</span>
+                </div>
+                <div class="chest-main">
+                    <div class="chest-storage">
+                        <h3>Chest</h3>
+                        <div class="chest-grid" id="chest-grid">
+                            <!-- Chest slots will be generated by JS -->
+                        </div>
+                    </div>
+                    <div class="chest-inventory">
+                        <h3>Your Inventory</h3>
+                        <div class="chest-inv-grid" id="chest-inv-grid"></div>
+                        <h4 class="hotbar-label">Hotbar</h4>
+                        <div class="chest-hotbar" id="chest-hotbar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Creative Inventory -->
+        <div id="creative-overlay" class="overlay hidden">
+            <div class="creative-container">
+                <div class="creative-header">
+                    <h2>Creative Inventory</h2>
+                    <span class="creative-hint">Press E to close</span>
+                </div>
+                <div class="creative-tabs">
+                    <button class="creative-tab active" data-category="stone">Stone</button>
+                    <button class="creative-tab" data-category="natural">Natural</button>
+                    <button class="creative-tab" data-category="building">Building</button>
+                    <button class="creative-tab" data-category="tools">Tools</button>
+                    <button class="creative-tab" data-category="food">Food</button>
+                </div>
+                <div class="creative-main">
+                    <div class="creative-items" id="creative-items">
+                        <!-- Items will be generated by JS -->
+                    </div>
+                    <div class="creative-player-section">
+                        <div class="creative-equipment-slots" id="creative-equipment-slots">
+                            <div class="equipment-slot" id="creative-slot-helmet" data-slot="helmet" title="Helmet"></div>
+                            <div class="equipment-slot" id="creative-slot-backpack" data-slot="backpack" title="Backpack"></div>
+                            <div class="equipment-slot" id="creative-slot-chestplate" data-slot="chestplate" title="Chestplate"></div>
+                            <div class="equipment-slot" id="creative-slot-leggings" data-slot="leggings" title="Leggings"></div>
+                            <div class="equipment-slot" id="creative-slot-boots" data-slot="boots" title="Boots"></div>
+                        </div>
+                        <div class="player-skin-preview" id="creative-player-skin">
+                            <div class="skin-head"></div>
+                            <div class="skin-body"></div>
+                            <div class="skin-leg skin-leg-left"></div>
+                            <div class="skin-leg skin-leg-right"></div>
+                        </div>
+                        <div class="creative-player-inv">
+                            <h3>Your Inventory</h3>
+                            <div class="creative-inv-grid" id="creative-inv-grid"></div>
+                            <h4>Hotbar</h4>
+                            <div class="creative-hotbar" id="creative-hotbar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Inventory -->
+        <div id="inventory-overlay" class="overlay hidden">
+            <div class="inventory-container">
+                <div class="inventory-header">
+                    <h2>Inventory</h2>
+                    <span class="inventory-hint">Press E to close</span>
+                </div>
+                <div class="inventory-main">
+                    <div class="inventory-left">
+                        <div class="inventory-grid" id="inventory-grid">
+                            <!-- Inventory slots will be generated by JS -->
+                        </div>
+                        <div class="inventory-hotbar-section">
+                            <h3>Hotbar</h3>
+                            <div class="inventory-hotbar" id="inventory-hotbar">
+                                <!-- Hotbar slots will be generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-equipment-section">
+                        <div class="equipment-slots">
+                            <div class="equipment-slot" id="slot-helmet" data-slot="helmet" title="Helmet"></div>
+                            <div class="equipment-slot" id="slot-backpack" data-slot="backpack" title="Backpack"></div>
+                            <div class="equipment-slot" id="slot-chestplate" data-slot="chestplate" title="Chestplate"></div>
+                            <div class="equipment-slot" id="slot-leggings" data-slot="leggings" title="Leggings"></div>
+                            <div class="equipment-slot" id="slot-boots" data-slot="boots" title="Boots"></div>
+                        </div>
+                        <div class="player-skin-preview" id="player-skin-preview">
+                            <!-- Player skin will be drawn here -->
+                            <div class="skin-head"></div>
+                            <div class="skin-body"></div>
+                            <div class="skin-arm skin-arm-left"></div>
+                            <div class="skin-arm skin-arm-right"></div>
+                            <div class="skin-leg skin-leg-left"></div>
+                            <div class="skin-leg skin-leg-right"></div>
+                        </div>
+                    </div>
+                    <div class="crafting-section">
+                        <h3>Crafting</h3>
+                        <div class="crafting-area">
+                            <div class="crafting-grid" id="crafting-grid">
+                                <!-- 2x2 crafting grid will be generated by JS -->
+                            </div>
+                            <div class="crafting-arrow">→</div>
+                            <div class="crafting-result" id="crafting-result">
+                                <!-- Result slot will be generated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
