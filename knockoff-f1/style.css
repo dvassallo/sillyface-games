@@ -1,0 +1,1542 @@
+:root {
+    --bg-color: #0f0f12;
+    --accent-color: #ff1e1e;
+    --text-color: #ffffff;
+    --glass-bg: rgba(20, 20, 25, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --font-main: 'Outfit', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #000;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#ui-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.screen {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #000000;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.menu-content {
+    width: 100%;
+    padding: 0 0.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.screen.active {
+    opacity: 1;
+}
+
+/* Main Menu */
+h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -2px;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 20px rgba(255, 30, 30, 0.5);
+    text-align: center;
+    padding: 0 1rem;
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.accent {
+    color: var(--accent-color);
+}
+
+.btn-primary,
+.btn-secondary {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: transform 0.1s, box-shadow 0.2s;
+    clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+    width: 100%;
+    max-width: 280px;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255, 30, 30, 0.6);
+}
+
+.btn-secondary {
+    background: #333;
+}
+
+.btn-secondary:hover {
+    background: #444;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0 2rem;
+    align-items: center;
+}
+
+.credits {
+    position: absolute;
+    bottom: 2rem;
+    right: 2rem;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    font-weight: 300;
+    opacity: 0.6;
+    letter-spacing: 1px;
+}
+
+/* Track Selection */
+.track-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 320px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+/* Custom Scrollbar */
+.track-grid::-webkit-scrollbar {
+    width: 8px;
+}
+
+.track-grid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.track-grid::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 4px;
+}
+
+.track-grid::-webkit-scrollbar-thumb:hover {
+    background: #ff4040;
+}
+
+.track-card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.track-card:hover {
+    background: rgba(255, 40, 0, 0.2);
+    border-color: #ff2800;
+    transform: translateY(-5px);
+}
+
+.track-card h3 {
+    margin: 0 0 4px 0;
+    color: #fff;
+    font-size: 1.1rem;
+}
+
+.track-card p {
+    margin: 0;
+    color: #aaa;
+    font-size: 0.8rem;
+}
+
+.menu-actions {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0 1rem;
+    align-items: center;
+}
+
+/* Driver Selection */
+.driver-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 320px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.driver-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.driver-card:hover {
+    background: rgba(255, 40, 0, 0.2);
+    border-color: #ff2800;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.driver-card .driver-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.driver-card .driver-team {
+    font-size: 0.75rem;
+    opacity: 0.8;
+}
+
+.driver-card .driver-number {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* Tyre Selection */
+.tyre-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 15px;
+    width: 100%;
+    max-width: 320px;
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.tyre-card {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 12px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tyre-card:hover {
+    background: rgba(255, 40, 0, 0.2);
+    border-color: #ff2800;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.tyre-circle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 3px solid #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #000;
+}
+
+.tyre-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.tyre-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tyre-description {
+    font-size: 0.75rem;
+    opacity: 0.75;
+}
+
+/* HUD */
+#hud {
+    background: none;
+    backdrop-filter: none;
+    justify-content: space-between;
+    padding: 2rem;
+    pointer-events: none;
+}
+
+.hud-top {
+    display: flex;
+    justify-content: flex-start;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+/* Multiplayer race waiting message */
+.race-waiting-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--glass-bg);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 2rem 3rem;
+    z-index: 10;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.race-waiting-message span {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* F1-style start lights */
+.start-lights {
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.start-light {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(80, 0, 0, 0.6); /* off state: dark red */
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+.start-light.on {
+    background: #ff1e1e;
+    box-shadow: 0 0 16px rgba(255, 30, 30, 0.9);
+}
+
+.hud-bottom-left {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lap-time-box {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.lap-time-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: var(--font-main);
+    letter-spacing: 1px;
+    color: #22c55e; /* Green by default for time trials */
+}
+
+.best-lap-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-family: var(--font-main);
+    letter-spacing: 1px;
+    color: #a855f7; /* Purple for best lap */
+}
+
+/* Lap Times Panel */
+.lap-times-panel {
+    position: absolute;
+    bottom: 2rem;
+    left: 2rem;
+    width: 220px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lap-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 0.5rem;
+    min-height: 1.5rem;
+}
+
+.lap-history:empty {
+    border-bottom: none;
+    padding-bottom: 0;
+    min-height: 0;
+}
+
+.lap-history-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-main);
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.lap-history-row .lap-num {
+    opacity: 0.6;
+    font-size: 0.9rem;
+    min-width: 50px;
+}
+
+.lap-history-row .lap-time {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.lap-history-row.best .lap-time {
+    color: #a855f7; /* Purple for best */
+}
+
+.lap-history-row.invalid .lap-time {
+    color: #ef4444; /* Red for invalid/track limits */
+}
+
+.lap-history-row:not(.best):not(.invalid) .lap-time {
+    color: #fbbf24; /* Yellow for non-best valid laps */
+}
+
+.current-lap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding-top: 0.25rem;
+}
+
+.current-lap .label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-bottom: 0.25rem;
+}
+
+.current-lap .lap-time-value {
+    font-size: 2rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.save-times-hint {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+}
+
+.share-name-block {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.share-name-input {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    font-family: var(--font-main);
+    width: 100%;
+    max-width: 250px;
+}
+
+.share-name-input.invalid {
+    border-color: #ef4444;
+}
+
+.position-box,
+.lap-box {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.label {
+    font-size: 0.8rem;
+    font-weight: 300;
+    opacity: 0.8;
+}
+
+.value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.total {
+    font-size: 1.2rem;
+    opacity: 0.5;
+    font-weight: 500;
+}
+
+.hud-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+}
+
+.telemetry {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.pause-indicator {
+    align-self: center;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.6);
+    font-size: 0.8rem;
+    opacity: 0.8;
+}
+
+.speed-box {
+    background: var(--glass-bg);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--glass-border);
+    text-align: right;
+}
+
+.unit {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.gear-box {
+    background: var(--accent-color);
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    font-size: 2rem;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(255, 30, 30, 0.4);
+}
+
+.tire-weather {
+    display: flex;
+    gap: 1rem;
+}
+
+#tire-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    border: 3px solid #fff;
+    color: #000;
+}
+
+.tire-soft {
+    background: #ff3333;
+}
+
+.tire-medium {
+    background: #ffe600;
+}
+
+.tire-hard {
+    background: #ffffff;
+}
+
+.tire-inter {
+    background: #39b54a;
+}
+
+.tire-wet {
+    background: #0066ff;
+}
+
+/* Tyre wear bar */
+#tire-wear-bar {
+    width: 10px;
+    height: 50px;
+    border-radius: 4px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    background: rgba(0, 0, 0, 0.6);
+}
+
+#tire-wear-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, #00ff66, #ffcc00, #ff3333);
+}
+
+#weather-icon {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+/* Weather state styles */
+.weather-sunny {
+    background: linear-gradient(135deg, rgba(255, 200, 50, 0.3), rgba(255, 150, 0, 0.2));
+    border-color: rgba(255, 200, 50, 0.4);
+}
+
+.weather-cloudy {
+    background: linear-gradient(135deg, rgba(150, 160, 180, 0.3), rgba(100, 110, 130, 0.2));
+    border-color: rgba(150, 160, 180, 0.4);
+}
+
+.weather-light-rain {
+    background: linear-gradient(135deg, rgba(100, 150, 200, 0.3), rgba(80, 120, 160, 0.2));
+    border-color: rgba(100, 150, 200, 0.5);
+    animation: rain-pulse 2s ease-in-out infinite;
+}
+
+.weather-heavy-rain {
+    background: linear-gradient(135deg, rgba(60, 100, 150, 0.4), rgba(40, 70, 120, 0.3));
+    border-color: rgba(60, 100, 200, 0.6);
+    box-shadow: 0 0 10px rgba(100, 150, 255, 0.3);
+    animation: rain-pulse 1s ease-in-out infinite;
+}
+
+@keyframes rain-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Weather warning indicator for slippery conditions */
+.weather-warning {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 150, 0, 0.9);
+    color: #000;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    animation: warning-flash 1s ease-in-out infinite;
+    z-index: 10;
+}
+
+@keyframes warning-flash {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Slip indicator overlay */
+.slip-indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(255, 100, 100, 0.2) 100%);
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 5;
+}
+
+.slip-indicator.active {
+    opacity: 1;
+    animation: slip-shake 0.3s ease-in-out;
+}
+
+@keyframes slip-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Weather Selection */
+.weather-question {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.weather-toggle-container {
+    margin: 1rem 0 2rem 0;
+}
+
+.weather-toggle {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.weather-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem 2rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    color: #fff;
+}
+
+.weather-option:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.weather-option.active {
+    background: rgba(255, 40, 0, 0.2);
+    border-color: var(--accent-color);
+    box-shadow: 0 0 20px rgba(255, 30, 30, 0.3);
+}
+
+.weather-option .option-icon {
+    font-size: 2.5rem;
+}
+
+.weather-option .option-label {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.weather-option .option-desc {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+/* Custom Rain Container */
+.custom-rain-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1rem 0;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    animation: fadeIn 0.3s ease;
+}
+
+.custom-rain-container.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.rain-input-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 300px;
+}
+
+.rain-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.rain-input {
+    width: 100px;
+    padding: 0.75rem 1rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: #fff;
+    font-family: var(--font-main);
+}
+
+.rain-input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.rain-percent-symbol {
+    font-size: 1.5rem;
+    font-weight: 700;
+    opacity: 0.8;
+}
+
+.rain-slider-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.rain-slider {
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(to right, 
+        #ffd700 0%,      /* Sunny yellow */
+        #87ceeb 30%,     /* Light blue */
+        #4169e1 60%,     /* Rain blue */
+        #1a1a3e 100%     /* Storm dark */
+    );
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.rain-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent-color);
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.rain-slider::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent-color);
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.rain-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* Results Screen */
+#results-list {
+    width: 100%;
+    max-width: 320px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 1rem;
+}
+
+.result-row:last-child {
+    border-bottom: none;
+}
+
+.result-row .pos {
+    font-weight: 700;
+    width: 40px;
+    color: var(--accent-color);
+}
+
+.result-row .name {
+    flex-grow: 1;
+    text-align: left;
+    padding-left: 20px;
+}
+
+.result-row .team {
+    font-size: 1.5rem;
+}
+
+/* Leaderboard */
+.leaderboard-list {
+    width: 100%;
+    max-width: 320px;
+    margin: 10px 0;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Minimap */
+#minimap-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid rgba(255, 30, 30, 0.6);
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+}
+
+#minimap {
+    display: block;
+    width: 200px;
+    height: 200px;
+}
+
+/* Multiplayer Lobby */
+.lobby-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 2rem 0;
+    width: 100%;
+    padding: 0 2rem;
+    align-items: center;
+}
+
+.room-code-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.room-code {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 0.3rem;
+    color: var(--accent-color);
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.2rem;
+    border-radius: 8px;
+    border: 2px solid var(--accent-color);
+}
+
+.room-hint {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.5rem;
+}
+
+.room-code-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.code-input {
+    font-size: 1.8rem;
+    font-weight: 700;
+    letter-spacing: 0.3rem;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--text-color);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    border: 2px solid var(--glass-border);
+    outline: none;
+    width: 220px;
+    font-family: 'Courier New', monospace;
+}
+
+.code-input:focus {
+    border-color: var(--accent-color);
+}
+
+.code-input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.connection-status {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin: 1rem 0;
+    min-height: 1.5rem;
+    padding: 0 1rem;
+    text-align: center;
+}
+
+.connection-status.error {
+    color: #ef4444;
+}
+
+.connection-status.success {
+    color: #22c55e;
+}
+
+/* Waiting screen */
+.waiting-message {
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.waiting-message p {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.loading-dots {
+    font-size: 2rem;
+    color: var(--accent-color);
+}
+
+.loading-dots span {
+    animation: blink 1.4s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0%, 20% { opacity: 0; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+/* Wider containers on desktop */
+@media (min-width: 600px) {
+    h1 {
+        font-size: 3rem;
+    }
+    
+    h2 {
+        font-size: 1.8rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        max-width: 400px;
+        padding: 1rem 2rem;
+        font-size: 1.2rem;
+    }
+    
+    .track-grid {
+        max-width: 450px;
+    }
+    
+    .track-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .driver-grid {
+        max-width: 450px;
+        gap: 12px;
+    }
+    
+    .driver-card {
+        padding: 14px 16px;
+    }
+    
+    .driver-card .driver-name {
+        font-size: 1.1rem;
+    }
+    
+    .driver-card .driver-team {
+        font-size: 0.85rem;
+    }
+    
+    .tyre-grid {
+        max-width: 450px;
+    }
+    
+    .tyre-card {
+        padding: 16px 18px;
+    }
+    
+    .tyre-circle {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .tyre-label {
+        font-size: 1.1rem;
+    }
+    
+    #results-list,
+    .leaderboard-list {
+        max-width: 450px;
+        padding: 15px;
+    }
+    
+    .result-row {
+        font-size: 1.1rem;
+        padding: 10px;
+    }
+    
+    .room-code {
+        font-size: 2.5rem;
+        letter-spacing: 0.4rem;
+    }
+    
+    .code-input {
+        font-size: 2rem;
+        width: 260px;
+    }
+    
+    /* Weather Selection */
+    .weather-question {
+        font-size: 0.95rem;
+        padding: 0 1rem;
+    }
+    
+    .weather-toggle {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .weather-option {
+        padding: 1rem 1.5rem;
+        min-width: 200px;
+    }
+    
+    .weather-option .option-icon {
+        font-size: 2rem;
+    }
+    
+    .weather-option .option-label {
+        font-size: 1rem;
+    }
+    
+    .custom-rain-container {
+        padding: 1rem;
+        width: 90%;
+    }
+    
+    .rain-input {
+        width: 80px;
+        font-size: 1.2rem;
+    }
+}
+
+/* Extra small screens (very narrow phones) */
+@media (max-width: 380px) {
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        padding: 0.7rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .driver-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .room-code {
+        font-size: 1.6rem;
+    }
+    
+    .code-input {
+        font-size: 1.5rem;
+        width: 200px;
+    }
+}
+
+/* ==================== Mobile Touch Controls ==================== */
+.touch-controls {
+    display: none; /* Hidden by default, shown on touch devices */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40%;
+    pointer-events: auto;
+    z-index: 100;
+}
+
+/* Show on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .touch-controls {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    /* Adjust HUD for mobile */
+    #hud {
+        padding: 0.5rem;
+    }
+    
+    .hud-top {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .position-box,
+    .lap-box {
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .position-box .value,
+    .lap-box .value {
+        font-size: 1.5rem;
+    }
+    
+    .position-box .total,
+    .lap-box .total {
+        font-size: 0.9rem;
+    }
+    
+    .position-box .label,
+    .lap-box .label {
+        font-size: 0.65rem;
+    }
+    
+    .telemetry {
+        gap: 0.5rem;
+    }
+    
+    .speed-box {
+        padding: 0.5rem 0.8rem;
+    }
+    
+    .speed-box .value {
+        font-size: 1.5rem;
+    }
+    
+    .gear-box {
+        width: 40px;
+        height: 40px;
+        font-size: 1.3rem;
+    }
+    
+    #tire-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+    
+    #tire-wear-bar {
+        height: 35px;
+        width: 8px;
+    }
+    
+    #weather-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+    
+    /* Minimap smaller on mobile */
+    #minimap-container {
+        top: 10px;
+        right: 10px;
+        padding: 5px;
+    }
+    
+    #minimap {
+        width: 100px;
+        height: 100px;
+    }
+    
+    /* Lap times panel - move above touch controls */
+    .lap-times-panel {
+        bottom: auto;
+        top: 70px;
+        left: 10px;
+        width: 160px;
+        padding: 0.5rem;
+        transform: none;
+    }
+    
+    .lap-history-row {
+        font-size: 0.85rem;
+    }
+    
+    .lap-history-row .lap-num {
+        font-size: 0.75rem;
+        min-width: 40px;
+    }
+    
+    .current-lap .lap-time-value {
+        font-size: 1.3rem;
+    }
+    
+    .current-lap .label {
+        font-size: 0.65rem;
+    }
+    
+    .save-times-hint {
+        display: none;
+    }
+    
+    .pause-indicator {
+        display: none;
+    }
+    
+    /* Start lights smaller */
+    .start-lights {
+        top: 12%;
+        gap: 8px;
+    }
+    
+    .start-light {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+/* Steering zones (left side) */
+.touch-steering {
+    display: flex;
+    width: 45%;
+    height: 100%;
+}
+
+.steer-zone {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background 0.1s;
+}
+
+.steer-left {
+    border-radius: 20px 0 0 0;
+}
+
+.steer-right {
+    border-radius: 0 20px 0 0;
+}
+
+.steer-zone.active {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.steer-arrow {
+    font-size: 3rem;
+    color: rgba(255, 255, 255, 0.4);
+    pointer-events: none;
+}
+
+.steer-zone.active .steer-arrow {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Pedals (right side) */
+.touch-pedals {
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 100%;
+    gap: 4px;
+}
+
+.pedal {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 12px;
+    transition: all 0.1s;
+    border: 2px solid transparent;
+}
+
+.pedal-gas {
+    background: rgba(34, 197, 94, 0.3);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+
+.pedal-gas.active {
+    background: rgba(34, 197, 94, 0.6);
+    border-color: rgba(34, 197, 94, 0.9);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+.pedal-brake {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: rgba(239, 68, 68, 0.5);
+}
+
+.pedal-brake.active {
+    background: rgba(239, 68, 68, 0.6);
+    border-color: rgba(239, 68, 68, 0.9);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+}
+
+.pedal-label {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    pointer-events: none;
+    letter-spacing: 2px;
+}
+
+.pedal.active .pedal-label {
+    color: rgba(255, 255, 255, 1);
+}
+
+/* Landscape orientation adjustments for touch devices */
+@media (orientation: landscape) and (hover: none) and (pointer: coarse) {
+    .touch-controls {
+        height: 45%;
+    }
+    
+    .lap-times-panel {
+        top: auto;
+        bottom: 47%;
+        left: 10px;
+    }
+    
+    #minimap-container {
+        top: 5px;
+        right: 5px;
+    }
+    
+    #minimap {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .hud-top {
+        gap: 5px;
+    }
+}
+
+/* Portrait orientation for touch devices */
+@media (orientation: portrait) and (hover: none) and (pointer: coarse) {
+    .touch-controls {
+        height: 35%;
+    }
+    
+    .lap-times-panel {
+        top: auto;
+        bottom: 37%;
+    }
+}
