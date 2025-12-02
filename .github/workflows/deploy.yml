@@ -205,6 +205,41 @@ jobs:
           
           echo "Processed certificates for $CERTS_ISSUED apps"
 
+      - name: Clean up orphaned certificates
+        run: |
+          DOMAIN="${{ env.DOMAIN }}"
+          
+          # Get list of deployed apps
+          APPS=$(find . -maxdepth 1 -type d \
+            ! -name '.' \
+            ! -name '.git' \
+            ! -name '.github' \
+            ! -name 'server-setup' \
+            ! -name '_root' \
+            -printf '%f\n' | sort)
+          
+          # Get list of certs on server and clean up orphaned ones
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            root@${{ env.DOMAIN }} << CLEANUP_SCRIPT
+          
+          # Find all subdomain certs (exclude root domain cert)
+          for cert_dir in /etc/letsencrypt/live/*.${DOMAIN}; do
+            [ -d "\$cert_dir" ] || continue
+            
+            cert_name=\$(basename "\$cert_dir")
+            # Extract subdomain (remove .domain.com suffix)
+            subdomain=\${cert_name%.${DOMAIN}}
+            
+            # Check if this subdomain still exists as a deployed app
+            if [ ! -d "/var/www/apps/\$subdomain" ]; then
+              echo "Removing orphaned certificate for \$cert_name..."
+              certbot delete --cert-name "\$cert_name" --non-interactive || true
+            fi
+          done
+          CLEANUP_SCRIPT
+          
+          echo "Orphaned certificate cleanup complete"
+
       - name: Update nginx config and reload
         run: |
           # Copy latest nginx config
