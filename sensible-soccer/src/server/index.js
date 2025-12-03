@@ -1,19 +1,34 @@
 import { createServer } from 'http';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import express from 'express';
 import { WebSocketServer } from 'ws';
 import pino from 'pino';
 import { GameRoom } from './game/GameRoom.js';
 import { LobbyManager } from './matchmaking/LobbyManager.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' });
 
 const PORT = process.env.PORT || 8080;
 
-// Create Express app for health checks
+// Create Express app
 const app = express();
 
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Serve static files from the built client
+const distPath = join(__dirname, '../../dist');
+app.use(express.static(distPath));
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', (req, res) => {
+  res.sendFile(join(distPath, 'index.html'));
 });
 
 // Create HTTP server

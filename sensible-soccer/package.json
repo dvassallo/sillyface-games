@@ -2,23 +2,38 @@
   "name": "sensible-soccer",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Multiplayer Sensible Soccer clone",
-  "workspaces": [
-    "packages/shared",
-    "packages/client",
-    "packages/server"
-  ],
+  "main": "src/server/index.js",
   "scripts": {
-    "dev": "npm run dev --workspaces --if-present",
-    "dev:client": "npm run dev -w packages/client",
-    "dev:server": "npm run dev -w packages/server",
-    "build": "npm run build --workspaces --if-present",
-    "start": "npm run start -w packages/server",
-    "lint": "eslint packages/*/src",
-    "test": "npm run test --workspaces --if-present"
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "nodemon src/server/index.js",
+    "build": "vite build",
+    "start": "node src/server/index.js",
+    "preview": "vite preview",
+    "lint": "eslint src",
+    "test": "echo \"No tests yet\""
+  },
+  "dependencies": {
+    "@msgpack/msgpack": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "howler": "^2.2.4",
+    "nanoid": "^5.0.9",
+    "pixi.js": "^8.6.6",
+    "pino": "^9.6.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "ws": "^8.18.0",
+    "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
-    "prettier": "^3.3.3"
+    "nodemon": "^3.1.9",
+    "prettier": "^3.3.3",
+    "vite": "^5.4.11"
   }
 }

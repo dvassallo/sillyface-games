@@ -13,7 +13,7 @@ import {
   CORNER_ARC_RADIUS,
   PLAYER_RADIUS,
   BALL_RADIUS
-} from '@sensible-soccer/shared';
+} from '../../shared/index.js';
 
 export default class GameRenderer {
   constructor(app, scale = 1) {

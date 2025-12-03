@@ -3,7 +3,7 @@ import {
   FIELD_WIDTH,
   FIELD_HEIGHT,
   TICK_MS
-} from '@sensible-soccer/shared';
+} from '../../shared/index.js';
 import GameRenderer from './GameRenderer.js';
 import InputManager from './InputManager.js';
 import networkManager from '../network/NetworkManager.js';

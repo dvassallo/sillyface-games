@@ -5,18 +5,22 @@ import {
   TICK_MS,
   KICK_POWER_MIN,
   KICK_POWER_MAX,
-  KICK_CHARGE_TIME
-} from '@sensible-soccer/shared';
-import { createBall, updateBall, kickBall, isInGoal, applyAftertouch } from '@sensible-soccer/shared';
-import { createPlayer, updatePlayer, getFormationPositions } from '@sensible-soccer/shared';
-import {
+  KICK_CHARGE_TIME,
+  createBall,
+  updateBall,
+  kickBall,
+  isInGoal,
+  applyAftertouch,
+  createPlayer,
+  updatePlayer,
+  getFormationPositions,
   checkBallPossession,
   checkPlayerBallCollision,
   bounceBallOffPlayer,
   getDribblePosition,
-  checkTackleHitsBall
-} from '@sensible-soccer/shared';
-import { startTackle } from '@sensible-soccer/shared';
+  checkTackleHitsBall,
+  startTackle
+} from '../../shared/index.js';
 import GameRenderer from './GameRenderer.js';
 import InputManager from './InputManager.js';
 

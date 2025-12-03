@@ -6,9 +6,7 @@ import {
   FIELD_HEIGHT,
   KICK_POWER_MIN,
   KICK_POWER_MAX,
-  KICK_CHARGE_TIME
-} from '@sensible-soccer/shared';
-import {
+  KICK_CHARGE_TIME,
   createBall,
   updateBall,
   kickBall,
@@ -24,7 +22,7 @@ import {
   checkPlayerCollision,
   resolvePlayerCollision,
   checkTackleHitsBall
-} from '@sensible-soccer/shared';
+} from '../../shared/index.js';
 
 const POSSESSION_COOLDOWN = 0.3; // Seconds before player can repossess after kicking
 
