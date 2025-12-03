@@ -2095,11 +2095,17 @@ const CREATIVE_CATEGORIES = {
             BLOCK.BOW,
             BLOCK.ARROW,
             BLOCK.SNOWBALL,
-            BLOCK.FLINT_AND_STEEL,
+            BLOCK.FLINT_AND_STEEL
+        ]
+    },
+    resources: {
+        name: 'Resources',
+        items: [
             BLOCK.STICK,
             BLOCK.STRING,
             BLOCK.BONE,
             BLOCK.FLINT,
+            BLOCK.COAL,
             BLOCK.IRON_INGOT,
             BLOCK.GOLD_INGOT,
             BLOCK.COPPER_INGOT

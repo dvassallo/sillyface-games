@@ -1656,10 +1656,11 @@ input[type="range"] {
 .block-preview.gold-ingot::before {
     content: '';
     position: absolute;
-    top: 8px;
-    left: 4px;
-    width: 24px;
-    height: 16px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    height: 50%;
     background: linear-gradient(180deg, #ffe040 0%, #ffd700 50%, #daa520 100%);
     border: 2px solid #b8860b;
     clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
@@ -1668,10 +1669,11 @@ input[type="range"] {
 .block-preview.gold-ingot::after {
     content: '';
     position: absolute;
-    top: 10px;
-    left: 8px;
-    width: 10px;
-    height: 4px;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30%;
+    height: 15%;
     background: rgba(255, 255, 200, 0.5);
     border-radius: 2px;
 }
