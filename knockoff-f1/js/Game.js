@@ -1010,7 +1010,11 @@ class Game {
         this.minimap = new Minimap(this.track);
         
         // Apply weather settings based on mode
-        if (this.weatherMode === 'custom') {
+        if (this.gameMode === 'time_trials') {
+            // Time trials always have sunny weather - no rain
+            this.weatherSystem = new Weather();
+            this.weatherSystem.forceWeather('SUNNY');
+        } else if (this.weatherMode === 'custom') {
             this.applyCustomWeather();
         } else {
             // Regular mode: use historical weather data for this track
@@ -1198,7 +1202,10 @@ class Game {
     // Weather System
     // ---------------------------------------------------------------------
     updateWeather(deltaTime) {
-        if (this.weatherMode === 'custom') {
+        if (this.gameMode === 'time_trials') {
+            // Time trials: weather stays sunny, no updates needed
+            // The weather was already forced to SUNNY in startGame()
+        } else if (this.weatherMode === 'custom') {
             // Custom weather mode: use fixed rain percentage
             // Don't update the weather system dynamically
             // The weather was already set in startGame()
