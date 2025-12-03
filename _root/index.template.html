@@ -101,16 +101,15 @@
 
         .apps-grid a {
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             background: var(--c-card);
             border: var(--border);
-            border-radius: 24px;
-            padding: 2.5rem;
+            border-radius: 16px;
+            padding: 1.2rem 1.5rem;
             text-decoration: none;
             color: var(--c-text);
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             font-weight: 700;
             box-shadow: var(--shadow);
             transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1.2);
@@ -140,23 +139,6 @@
         .apps-grid a:nth-child(4n+2):hover { background-color: var(--c-2); }
         .apps-grid a:nth-child(4n+3):hover { background-color: var(--c-5); color: white; }
         .apps-grid a:nth-child(4n+4):hover { background-color: var(--c-1); color: white; }
-
-        /* Emojis */
-        .apps-grid a::before {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            filter: drop-shadow(4px 4px 0 rgba(0,0,0,0.2));
-            transition: transform 0.3s;
-        }
-        
-        .apps-grid a:hover::before {
-            transform: scale(1.2) rotate(10deg);
-        }
-
-        .apps-grid a:nth-child(4n+1)::before { content: '🎮'; }
-        .apps-grid a:nth-child(4n+2)::before { content: '🚀'; }
-        .apps-grid a:nth-child(4n+3)::before { content: '👾'; }
-        .apps-grid a:nth-child(4n+4)::before { content: '🎲'; }
 
         footer {
             margin-top: 5rem;
