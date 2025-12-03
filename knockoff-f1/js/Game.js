@@ -1202,8 +1202,20 @@ class Game {
     // Weather System
     // ---------------------------------------------------------------------
     updateWeather(deltaTime) {
-        if (this.weatherMode === 'custom' || this.gameMode === 'time_trials') {
-            // Custom weather mode or time trials: use fixed weather
+        if (this.gameMode === 'time_trials') {
+            // Time trials: always sunny, force all weather properties
+            this.weatherSystem.currentState = 'SUNNY';
+            this.weatherSystem.targetState = 'SUNNY';
+            this.weatherSystem.rainIntensity = 0;
+            this.weatherSystem.trackWetness = 0;
+            this.weatherSystem.slipFactor = 0;
+            this.weather = 'SUNNY';
+            this.rainIntensity = 0;
+            return;
+        }
+        
+        if (this.weatherMode === 'custom') {
+            // Custom weather mode: use fixed weather
             // Don't update the weather system dynamically
             // The weather was already set in startGame()
         } else {
