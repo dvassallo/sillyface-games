@@ -1012,6 +1012,10 @@ class Game {
         // Apply weather settings based on mode
         if (this.weatherMode === 'custom') {
             this.applyCustomWeather();
+        } else if (this.gameMode === 'time_trials') {
+            // Time trials: always sunny, no dynamic weather
+            this.weatherSystem = new Weather();
+            this.weatherSystem.forceWeather('SUNNY');
         } else {
             // Regular mode: use historical weather data for this track
             this.weatherSystem = new Weather(this.track.id);
