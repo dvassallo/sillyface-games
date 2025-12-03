@@ -1202,8 +1202,8 @@ class Game {
     // Weather System
     // ---------------------------------------------------------------------
     updateWeather(deltaTime) {
-        if (this.weatherMode === 'custom') {
-            // Custom weather mode: use fixed rain percentage
+        if (this.weatherMode === 'custom' || this.gameMode === 'time_trials') {
+            // Custom weather mode or time trials: use fixed weather
             // Don't update the weather system dynamically
             // The weather was already set in startGame()
         } else {
