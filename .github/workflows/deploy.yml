@@ -18,5 +18,5 @@ jobs:
         with:
           domain: ${{ secrets.DOMAIN || 'assetstacks.com' }}
           deploy_key: ${{ secrets.DEPLOY_KEY }}
-          letsencrypt_email: ${{ secrets.LETSENCRYPT_EMAIL || 'daniel@vassallo.dev' }}
+          letsencrypt_email: ${{ secrets.LETSENCRYPT_EMAIL || 'daniel@hey.com' }}
           force_setup: ${{ inputs.force_setup }}
