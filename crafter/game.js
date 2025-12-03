@@ -6308,44 +6308,52 @@ let customBlockImages = {}; // Pre-loaded Image objects for fast drawing
 
 function loadCustomBlockTextures() {
     try {
+        // First, load default hard-coded textures
+        if (typeof DEFAULT_BLOCK_TEXTURES !== 'undefined') {
+            customBlockTextures = { ...DEFAULT_BLOCK_TEXTURES };
+            console.log('Loading default block textures:', Object.keys(customBlockTextures).length);
+        }
+        
+        // Then, override with any localStorage customizations
         const saved = localStorage.getItem('crafterCustomBlocks');
         if (saved) {
-            customBlockTextures = JSON.parse(saved);
-            console.log('Loading custom block textures:', Object.keys(customBlockTextures).length);
-            
-            // Pre-load all custom textures as Image objects for fast rendering
-            for (const blockId in customBlockTextures) {
-                const data = customBlockTextures[blockId];
-                if (data.imageData) {
-                    // Use cached image data
-                    const img = new Image();
-                    img.src = data.imageData;
-                    customBlockImages[blockId] = img;
-                } else if (data.pixels) {
-                    // Generate image from pixels (backwards compatibility)
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 32;
-                    canvas.height = 32;
-                    const ctx = canvas.getContext('2d');
-                    ctx.imageSmoothingEnabled = false;
-                    
-                    const pixelSize = 32 / 16;
-                    for (let py = 0; py < 16; py++) {
-                        for (let px = 0; px < 16; px++) {
-                            if (data.pixels[py] && data.pixels[py][px]) {
-                                ctx.fillStyle = data.pixels[py][px];
-                                ctx.fillRect(px * pixelSize, py * pixelSize, pixelSize, pixelSize);
-                            }
+            const userTextures = JSON.parse(saved);
+            customBlockTextures = { ...customBlockTextures, ...userTextures };
+            console.log('User textures applied:', Object.keys(userTextures).length);
+        }
+        
+        // Pre-load all textures as Image objects for fast rendering
+        for (const blockId in customBlockTextures) {
+            const data = customBlockTextures[blockId];
+            if (data.imageData) {
+                // Use cached image data
+                const img = new Image();
+                img.src = data.imageData;
+                customBlockImages[blockId] = img;
+            } else if (data.pixels) {
+                // Generate image from pixels (backwards compatibility)
+                const canvas = document.createElement('canvas');
+                canvas.width = 32;
+                canvas.height = 32;
+                const ctx = canvas.getContext('2d');
+                ctx.imageSmoothingEnabled = false;
+                
+                const pixelSize = 32 / 16;
+                for (let py = 0; py < 16; py++) {
+                    for (let px = 0; px < 16; px++) {
+                        if (data.pixels[py] && data.pixels[py][px]) {
+                            ctx.fillStyle = data.pixels[py][px];
+                            ctx.fillRect(px * pixelSize, py * pixelSize, pixelSize, pixelSize);
                         }
                     }
-                    
-                    const img = new Image();
-                    img.src = canvas.toDataURL();
-                    customBlockImages[blockId] = img;
                 }
+                
+                const img = new Image();
+                img.src = canvas.toDataURL();
+                customBlockImages[blockId] = img;
             }
-            console.log('Custom textures loaded and cached!');
         }
+        console.log('Total textures loaded and cached:', Object.keys(customBlockTextures).length);
     } catch (e) {
         console.error('Error loading custom block textures:', e);
     }
