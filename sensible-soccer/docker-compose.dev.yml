@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  client:
+    command: npm run dev -w packages/client
+    environment:
+      - VITE_WS_URL=ws://localhost:8080
+
+  server:
+    command: npm run dev -w packages/server
+    environment:
+      - LOG_LEVEL=debug
