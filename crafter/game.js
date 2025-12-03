@@ -2105,7 +2105,6 @@ const CREATIVE_CATEGORIES = {
             BLOCK.STRING,
             BLOCK.BONE,
             BLOCK.FLINT,
-            BLOCK.COAL,
             BLOCK.IRON_INGOT,
             BLOCK.GOLD_INGOT,
             BLOCK.COPPER_INGOT
