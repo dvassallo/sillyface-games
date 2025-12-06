@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solitaire</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Title Screen -->
+        <div class="title-screen" id="titleScreen">
+            <div class="title-content">
+                <div class="logo">
+                    <div class="bouncing-cards">
+                        <div class="bounce-card" style="--i: 0; --color: #ff6b6b;">♠</div>
+                        <div class="bounce-card" style="--i: 1; --color: #ff9ff3;">♥</div>
+                        <div class="bounce-card" style="--i: 2; --color: #feca57;">♦</div>
+                        <div class="bounce-card" style="--i: 3; --color: #48dbfb;">♣</div>
+                        <div class="bounce-card" style="--i: 4; --color: #1dd1a1;">🃏</div>
+                    </div>
+                    <h1>Solitaire</h1>
+                    <p class="subtitle">✨ Klondike Fun ✨</p>
+                </div>
+                <button class="play-btn" id="playBtn">
+                    <span>Let's Play!</span>
+                    <span class="btn-sparkle">🎉</span>
+                </button>
+                <div class="game-features">
+                    <span class="feature-tag">🃏 Draw 3</span>
+                    <span class="feature-tag">⚡ Auto-Complete</span>
+                    <span class="feature-tag">💡 Hints</span>
+                </div>
+            </div>
+            <div class="floating-cards"></div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div class="header-left">
+                    <button class="icon-btn" id="menuBtn" title="Menu">
+                        <span>☰</span>
+                    </button>
+                    <button class="icon-btn" id="undoBtn" title="Undo">
+                        <span>↩</span>
+                    </button>
+                </div>
+                <div class="header-center">
+                    <div class="stat-item">
+                        <span class="stat-icon">⏱</span>
+                        <span class="stat-value" id="timer">0:00</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">🏆</span>
+                        <span class="stat-value" id="score">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">🔄</span>
+                        <span class="stat-value" id="moves">0</span>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <button class="icon-btn hint-btn" id="hintBtn" title="Hint">
+                        <span>💡</span>
+                    </button>
+                    <button class="icon-btn" id="autoBtn" title="Auto Complete">
+                        <span>⚡</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="game-board" id="gameBoard">
+                <!-- Top row: Stock, Waste, and Foundations -->
+                <div class="top-row">
+                    <div class="stock-waste-area">
+                        <div class="pile stock-pile" id="stock" data-pile="stock">
+                            <div class="pile-placeholder">🔄</div>
+                        </div>
+                        <div class="pile waste-pile" id="waste" data-pile="waste"></div>
+                    </div>
+                    <div class="foundations-area">
+                        <div class="pile foundation-pile" id="foundation-0" data-pile="foundation" data-index="0">
+                            <span class="foundation-suit">♠</span>
+                        </div>
+                        <div class="pile foundation-pile" id="foundation-1" data-pile="foundation" data-index="1">
+                            <span class="foundation-suit">♥</span>
+                        </div>
+                        <div class="pile foundation-pile" id="foundation-2" data-pile="foundation" data-index="2">
+                            <span class="foundation-suit">♦</span>
+                        </div>
+                        <div class="pile foundation-pile" id="foundation-3" data-pile="foundation" data-index="3">
+                            <span class="foundation-suit">♣</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tableau: 7 columns -->
+                <div class="tableau-row">
+                    <div class="pile tableau-pile" id="tableau-0" data-pile="tableau" data-index="0"></div>
+                    <div class="pile tableau-pile" id="tableau-1" data-pile="tableau" data-index="1"></div>
+                    <div class="pile tableau-pile" id="tableau-2" data-pile="tableau" data-index="2"></div>
+                    <div class="pile tableau-pile" id="tableau-3" data-pile="tableau" data-index="3"></div>
+                    <div class="pile tableau-pile" id="tableau-4" data-pile="tableau" data-index="4"></div>
+                    <div class="pile tableau-pile" id="tableau-5" data-pile="tableau" data-index="5"></div>
+                    <div class="pile tableau-pile" id="tableau-6" data-pile="tableau" data-index="6"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Win Screen -->
+        <div class="win-screen" id="winScreen">
+            <div class="win-content">
+                <div class="confetti-container" id="confetti"></div>
+                <h2 class="win-title">🎉 You Win! 🎉</h2>
+                <div class="win-stats">
+                    <div class="win-stat">
+                        <span class="win-stat-label">Time</span>
+                        <span class="win-stat-value" id="winTime">0:00</span>
+                    </div>
+                    <div class="win-stat">
+                        <span class="win-stat-label">Score</span>
+                        <span class="win-stat-value" id="winScore">0</span>
+                    </div>
+                    <div class="win-stat">
+                        <span class="win-stat-label">Moves</span>
+                        <span class="win-stat-value" id="winMoves">0</span>
+                    </div>
+                </div>
+                <button class="play-btn" id="playAgainBtn">
+                    <span>Play Again</span>
+                    <span class="btn-sparkle">🃏</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Menu Modal -->
+        <div class="modal-overlay" id="menuModal">
+            <div class="modal">
+                <h3>Menu</h3>
+                <button class="modal-btn" id="newGameBtn">🎴 New Game</button>
+                <button class="modal-btn" id="restartBtn">🔄 Restart</button>
+                <button class="modal-btn" id="resumeBtn">▶️ Resume</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
