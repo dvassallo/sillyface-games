@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leopard Gecko Quiz!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>🦎 Leopard Gecko Quiz 🦎</h1>
+            <div id="score-board" class="hidden">
+                <span id="score-label">Score: <span id="score">0</span></span>
+            </div>
+        </header>
+
+        <main id="game-area">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen active">
+                <h2>Do you know your geckos?</h2>
+                <p>Test your knowledge about these cute little lizards!</p>
+                <button id="start-btn" class="btn primary">Start Quiz!</button>
+            </div>
+
+            <!-- Question Screen -->
+            <div id="question-screen" class="screen hidden">
+                <div class="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+                <div class="category-tag" id="category-tag">Category</div>
+                <h3 id="question-text">Question goes here...</h3>
+                <div id="options-container" class="options-grid">
+                    <!-- Options injected by JS -->
+                </div>
+                <div id="feedback-area" class="hidden">
+                    <p id="feedback-text"></p>
+                    <button id="next-btn" class="btn secondary">Next Question ➜</button>
+                </div>
+            </div>
+
+            <!-- End Screen -->
+            <div id="end-screen" class="screen hidden">
+                <h2>Quiz Complete! 🎉</h2>
+                <p>You scored <span id="final-score">0</span> out of <span id="total-questions">0</span></p>
+                <p id="final-message">Great job!</p>
+                <button id="restart-btn" class="btn primary">Play Again 🔄</button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Made for Gecko Lovers!</p>
+        </footer>
+    </div>
+
+    <script src="questions.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
+
