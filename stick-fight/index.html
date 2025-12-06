@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stick Fight Arena</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Russo+One&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Flash Warning Screen -->
+    <div id="warning-screen" class="screen active">
+        <div class="warning-content">
+            <div class="warning-icon">⚡</div>
+            <h1 class="warning-title">FLASH WARNING</h1>
+            <p class="warning-text">This game contains flashing lights and effects that may potentially trigger seizures in people with photosensitive epilepsy.</p>
+            <p class="warning-text">Viewer discretion is advised.</p>
+            <button id="accept-warning-btn" class="btn">I UNDERSTAND - CONTINUE</button>
+        </div>
+    </div>
+
+    <!-- Character Selection Screen -->
+    <div id="menu-screen" class="screen">
+        <div class="menu-bg"></div>
+        <h1 class="title">STICK FIGHT</h1>
+        <h2 class="subtitle">ARENA</h2>
+        
+        <div class="character-select">
+            <h3>CHOOSE YOUR FIGHTER</h3>
+            <div class="characters">
+                <div class="character" data-color="#FF3366" data-name="Crimson">
+                    <canvas class="char-preview" width="80" height="120"></canvas>
+                    <span>CRIMSON</span>
+                </div>
+                <div class="character" data-color="#00D4FF" data-name="Azure">
+                    <canvas class="char-preview" width="80" height="120"></canvas>
+                    <span>AZURE</span>
+                </div>
+                <div class="character" data-color="#39FF14" data-name="Neon">
+                    <canvas class="char-preview" width="80" height="120"></canvas>
+                    <span>NEON</span>
+                </div>
+                <div class="character" data-color="#FFD700" data-name="Gold">
+                    <canvas class="char-preview" width="80" height="120"></canvas>
+                    <span>GOLD</span>
+                </div>
+                <div class="character" data-color="#FF00FF" data-name="Magenta">
+                    <canvas class="char-preview" width="80" height="120"></canvas>
+                    <span>MAGENTA</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls-info">
+            <h4>CONTROLS</h4>
+            <div class="control-keys">
+                <div class="key-group">
+                    <span class="key">←</span><span class="key">→</span>
+                    <span class="key-label">MOVE</span>
+                </div>
+                <div class="key-group">
+                    <span class="key">SPACE</span>
+                    <span class="key-label">JUMP</span>
+                </div>
+                <div class="key-group">
+                    <span class="key">M</span>
+                    <span class="key-label">PUNCH</span>
+                </div>
+            </div>
+        </div>
+        
+        <button id="start-btn" class="btn" disabled>SELECT A FIGHTER</button>
+        
+        <div class="bye-message">Bye, Nico.</div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="screen">
+        <div id="flash-overlay" class="flash-overlay"></div>
+        <div class="game-hud">
+            <div class="player-info player-1-info">
+                <span class="player-name">YOU</span>
+                <div class="hearts" id="player-hearts"></div>
+            </div>
+            <div id="level-display" class="level-display">
+                <span class="level-num">LVL 1</span>
+                <span class="level-name">Training Grounds</span>
+            </div>
+            <div class="player-info player-2-info">
+                <span class="player-name">ENEMY</span>
+                <div class="hearts" id="enemy-hearts"></div>
+            </div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="gameover-bg"></div>
+        <div class="gameover-content">
+            <h1 id="gameover-title">GAME OVER</h1>
+            <p id="gameover-message">You have been defeated!</p>
+            <button id="next-level-btn" class="btn next-level">NEXT LEVEL →</button>
+            <button id="restart-btn" class="btn">RESTART</button>
+            <button id="menu-btn" class="btn secondary">MAIN MENU</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+
