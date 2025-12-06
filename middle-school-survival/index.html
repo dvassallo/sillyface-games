@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Middle School Survival - 100 Days</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Main Menu -->
+        <div id="main-menu" class="screen active">
+            <div class="school-bg"></div>
+            <h1 class="title">🏫 Middle School Survival 🏫</h1>
+            <h2 class="subtitle">Can you survive 100 days?</h2>
+            <div class="menu-content">
+                <p class="warning">⚠️ Don't get 5 detentions! ⚠️</p>
+                <button id="start-btn" class="big-btn">Start School Year</button>
+                <div class="instructions">
+                    <h3>📚 How to Play:</h3>
+                    <ul>
+                        <li>🚌 Take the bus to school each day</li>
+                        <li>📝 Answer questions in class (5 per class)</li>
+                        <li>🍕 Have fun at lunch & recess</li>
+                        <li>😈 Don't get 5 detentions!</li>
+                        <li>🎓 Survive 100 days to graduate!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bus Scene -->
+        <div id="bus-screen" class="screen">
+            <div class="bus-bg"></div>
+            <div class="day-display">
+                <span id="day-label">Day</span>
+                <span id="day-number">1</span>
+                <span id="day-total">/ 100</span>
+            </div>
+            <div class="bus-container">
+                <div class="bus">
+                    <div class="bus-body">
+                        <div class="bus-windows">
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                            <div class="window"></div>
+                        </div>
+                        <div class="bus-text">SCHOOL BUS</div>
+                    </div>
+                    <div class="wheels">
+                        <div class="wheel"></div>
+                        <div class="wheel"></div>
+                    </div>
+                </div>
+            </div>
+            <p id="bus-message" class="bus-msg">🚌 Riding to school...</p>
+            <button id="bus-continue" class="big-btn">Continue</button>
+        </div>
+
+        <!-- Schedule Screen -->
+        <div id="schedule-screen" class="screen">
+            <div class="schedule-header">
+                <h2>📅 Today's Schedule</h2>
+                <div class="stats-bar">
+                    <span class="stat">📆 Day: <span id="sched-day">1</span>/100</span>
+                    <span class="stat">📝 Detentions: <span id="sched-detentions">0</span>/5</span>
+                    <span class="stat">⭐ Score: <span id="sched-score">0</span></span>
+                </div>
+            </div>
+            <div id="schedule-list" class="schedule-list"></div>
+            <button id="start-day-btn" class="big-btn">Start Classes!</button>
+        </div>
+
+        <!-- Class Screen (Questions) -->
+        <div id="class-screen" class="screen">
+            <div class="class-header">
+                <h2 id="class-name">📚 Language Arts</h2>
+                <div class="class-progress">
+                    <span>Question <span id="q-num">1</span>/5</span>
+                    <div class="progress-bar">
+                        <div id="q-progress" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="question-container">
+                <p id="question-text" class="question"></p>
+                <div id="answers" class="answers"></div>
+            </div>
+            <div id="feedback" class="feedback"></div>
+        </div>
+
+        <!-- Lunch Screen -->
+        <div id="lunch-screen" class="screen">
+            <div class="lunch-bg"></div>
+            <h2>🍕 Lunch Time! 🍔</h2>
+            <div class="lunch-game">
+                <p>Click the food to eat! Get as much as you can!</p>
+                <div id="lunch-area" class="lunch-area"></div>
+                <div class="lunch-stats">
+                    <span>🍕 Food eaten: <span id="food-count">0</span></span>
+                    <span>⏱️ Time: <span id="lunch-timer">15</span>s</span>
+                </div>
+            </div>
+            <button id="lunch-skip" class="big-btn skip-btn">I'm Done Eating</button>
+            <button id="lunch-done" class="big-btn" style="display:none;">Continue to Next Class</button>
+        </div>
+
+        <!-- Recess Screen -->
+        <div id="recess-screen" class="screen">
+            <div class="recess-bg"></div>
+            <h2>⚽ Recess Time! 🏃</h2>
+            <div class="recess-game">
+                <p>Dodge the balls! Use arrow keys or tap sides to move!</p>
+                <div id="recess-area" class="recess-area">
+                    <div id="player" class="player">🧍</div>
+                </div>
+                <div class="recess-stats">
+                    <span>💨 Dodged: <span id="dodge-count">0</span></span>
+                    <span>⏱️ Time: <span id="recess-timer">20</span>s</span>
+                </div>
+            </div>
+            <button id="recess-done" class="big-btn" style="display:none;">Continue to Next Class</button>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="gameover-screen" class="screen">
+            <div id="gameover-bg"></div>
+            <h1 id="gameover-title">😱 SUSPENDED! 😱</h1>
+            <p id="gameover-msg">You got too many detentions!</p>
+            <div class="final-stats">
+                <p>📆 Days Survived: <span id="final-days">0</span></p>
+                <p>⭐ Final Score: <span id="final-score">0</span></p>
+            </div>
+            <button id="restart-btn" class="big-btn">Try Again</button>
+        </div>
+
+        <!-- Win Screen -->
+        <div id="win-screen" class="screen">
+            <div class="confetti"></div>
+            <h1>🎓 CONGRATULATIONS! 🎓</h1>
+            <h2>You survived 100 days!</h2>
+            <div class="trophy">🏆</div>
+            <div class="final-stats">
+                <p>⭐ Final Score: <span id="win-score">0</span></p>
+                <p>You're officially a middle school graduate!</p>
+            </div>
+            <button id="play-again-btn" class="big-btn">Play Again</button>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
+

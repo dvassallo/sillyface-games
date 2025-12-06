@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Silly Face Games</title>
+    <title>Silly Face & Nico Pizza Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Rubik+Bubbles&display=swap" rel="stylesheet">
@@ -50,6 +50,13 @@
             display: inline-block;
             position: relative;
             animation: wobble 3s ease-in-out infinite;
+            z-index: 2;
+        }
+
+        .logo-container:nth-of-type(2) {
+            margin-left: -50px;
+            z-index: 1;
+            animation-delay: 0.5s;
         }
 
         .logo {
@@ -169,7 +176,10 @@
         <a href="https://www.youtube.com/@sillyface2789" target="_blank" class="logo-container">
             <img src="logo.jpg" alt="Silly Face Logo" class="logo">
         </a>
-        <h1>Silly Face</h1>
+        <a href="https://www.youtube.com/@Nicopizza1" target="_blank" class="logo-container">
+            <img src="logo2.jpg" alt="Silly Face Logo" class="logo">
+        </a>
+        <h1>Silly Face & Nico Pizza</h1>
         <div class="subtitle">{{APP_COUNT}} Games Ready to Play!</div>
     </header>
 
