@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Silly Chess</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+Symbols+2&family=Rubik+Bubbles&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-sidebar">
+            <header>
+                <h1>Silly Chess</h1>
+            </header>
+            
+            <div class="controls">
+                <div class="turn-indicator" id="turn-indicator">White's Turn</div>
+                <div id="check-indicator" class="check-indicator hidden">Check!</div>
+                <button id="reset-btn" class="btn">New Game</button>
+                <div id="message" class="message"></div>
+            </div>
+        </div>
+
+        <div class="board-container">
+            <div id="chess-board" class="chess-board"></div>
+        </div>
+    </div>
+
+    <!-- Promotion Modal -->
+    <div id="promotion-modal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Promote to:</h2>
+            <div class="promotion-options">
+                <div class="promo-piece" data-type="q">♕</div>
+                <div class="promo-piece" data-type="r">♖</div>
+                <div class="promo-piece" data-type="b">♗</div>
+                <div class="promo-piece" data-type="n">♘</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
