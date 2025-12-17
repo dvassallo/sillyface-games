@@ -1,0 +1,15 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Carrot Body -->
+  <path d="M16 28 Q12 10 10 4 L22 4 Q20 10 16 28" fill="#e67e22" stroke="#d35400" stroke-width="1"/>
+  
+  <!-- Lines/Texture -->
+  <path d="M12 8 L20 8" stroke="#d35400" stroke-width="1" opacity="0.5"/>
+  <path d="M13 14 L19 14" stroke="#d35400" stroke-width="1" opacity="0.5"/>
+  <path d="M14 20 L18 20" stroke="#d35400" stroke-width="1" opacity="0.5"/>
+
+  <!-- Greens -->
+  <path d="M12 4 Q10 0 8 2" fill="none" stroke="#2ecc71" stroke-width="2"/>
+  <path d="M16 4 Q16 -2 16 0" fill="none" stroke="#2ecc71" stroke-width="2"/>
+  <path d="M20 4 Q22 0 24 2" fill="none" stroke="#2ecc71" stroke-width="2"/>
+</svg>
+

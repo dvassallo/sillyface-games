@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bunny Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="ui">
+        <div id="stats">
+            <div>Health: <span id="health-display">100</span></div>
+            <div>Hunger: <span id="hunger-display">0</span></div>
+            <div>Score: <span id="score-display">0</span></div>
+        </div>
+        <div id="controls-hint" style="margin-top: 10px; font-size: 12px; color: #ccc;">
+            WASD to Move<br>SHIFT to Sprint<br>B to Burrow (Hide)
+        </div>
+        <canvas id="minimap" width="200" height="200"></canvas>
+        <div id="game-over" class="hidden">
+            <h1>Game Over</h1>
+            <p>You survived for <span id="days-survived">0</span> days.</p>
+            <button onclick="location.reload()">Play Again</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
+

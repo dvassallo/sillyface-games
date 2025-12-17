@@ -36,3 +36,8 @@ A 2D stick figure fighting game where you battle against an AI opponent!
 
 Simply open `index.html` in a web browser to play!
 
+
+
+
+
+

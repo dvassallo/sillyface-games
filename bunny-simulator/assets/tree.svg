@@ -1,0 +1,31 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="treeGradient" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" style="stop-color:#4caf50;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1b5e20;stop-opacity:1" />
+    </radialGradient>
+    <filter id="treeShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="4"/>
+      <feOffset dx="4" dy="4" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode in="offsetblur"/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Shadow/Canopy -->
+  <g filter="url(#treeShadow)">
+      <!-- Irregular canopy shape -->
+      <path d="M64 10 Q80 10 90 25 Q110 30 115 50 Q120 70 100 90 Q90 110 64 115 Q40 110 25 95 Q10 80 15 50 Q20 30 40 20 Q50 10 64 10 Z" fill="url(#treeGradient)"/>
+  </g>
+  
+  <!-- Texture details -->
+  <circle cx="50" cy="50" r="10" fill="rgba(0,0,0,0.1)"/>
+  <circle cx="80" cy="80" r="8" fill="rgba(0,0,0,0.1)"/>
+  <circle cx="90" cy="40" r="6" fill="rgba(255,255,255,0.1)"/>
+</svg>
+

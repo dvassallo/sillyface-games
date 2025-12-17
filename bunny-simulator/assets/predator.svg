@@ -1,0 +1,31 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="wolfFur" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#555;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#333;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Body -->
+  <ellipse cx="32" cy="32" rx="14" ry="20" fill="url(#wolfFur)" />
+  
+  <!-- Head/Snout Area -->
+  <ellipse cx="32" cy="22" rx="10" ry="12" fill="url(#wolfFur)" />
+  
+  <!-- Ears -->
+  <path d="M24 16 L20 4 L28 14 Z" fill="#444" />
+  <path d="M40 16 L44 4 L36 14 Z" fill="#444" />
+  
+  <!-- Snout -->
+  <path d="M28 14 L36 14 L32 4 Z" fill="#222" opacity="0.5"/> <!-- Nose bridge -->
+  
+  <!-- Eyes -->
+  <circle cx="27" cy="20" r="2" fill="#ffcc00"/> <!-- Glowing yellow eyes -->
+  <circle cx="37" cy="20" r="2" fill="#ffcc00"/>
+  <circle cx="27" cy="20" r="0.5" fill="#000"/>
+  <circle cx="37" cy="20" r="0.5" fill="#000"/>
+  
+  <!-- Tail -->
+  <path d="M32 48 Q20 60 32 64 Q44 60 32 48" fill="#444"/>
+</svg>
+

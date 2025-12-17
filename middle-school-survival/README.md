@@ -48,3 +48,8 @@ Make it through 100 days to graduate from middle school!
 
 Pure HTML, CSS, and JavaScript - no dependencies required!
 
+
+
+
+
+
