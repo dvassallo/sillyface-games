@@ -1,17 +1,57 @@
 name: Deploy
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sillyface-games-hetzner-deploy
+  cancel-in-progress: true
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, prod-deploy]
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: dvassallo/nobrainer.host@v1
-        with:
-          domain: ${{ secrets.DOMAIN || 'assetstacks.com' }}
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
-          letsencrypt_email: ${{ secrets.LETSENCRYPT_EMAIL || 'daniel@hey.com' }}
+      - name: Deploy with Kamal
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ github.sha }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          now_ms() {
+            echo "$(($(date +%s%N) / 1000000))"
+          }
+
+          start_ms=$(now_ms)
+          repo_dir=/srv/repos/sillyface-games
+          remote_url="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+
+          if [ ! -d "$repo_dir/.git" ]; then
+            rm -rf "$repo_dir"
+            git clone --depth=1 "$remote_url" "$repo_dir"
+          fi
+
+          cd "$repo_dir"
+          git remote set-url origin "$remote_url"
+          git fetch --depth=1 origin "$TARGET_SHA"
+          git reset --hard "$TARGET_SHA"
+          git remote set-url origin "https://github.com/${REPO}.git"
+
+          git_done_ms=$(now_ms)
+          if docker ps -a --format '{{.Names}}' | grep -q '^sillyface-games-web-'; then
+            kamal_command=redeploy
+          else
+            kamal_command=setup
+          fi
+
+          kamal "$kamal_command" -q
+          end_ms=$(now_ms)
+
+          echo "timing command=${kamal_command} git_ms=$((git_done_ms - start_ms)) kamal_ms=$((end_ms - git_done_ms)) total_ms=$((end_ms - start_ms))"

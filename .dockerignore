@@ -1,0 +1,11 @@
+.git
+.github
+.kamal
+.DS_Store
+node_modules
+**/node_modules
+dist
+build
+*.log
+.env
+.env.*
